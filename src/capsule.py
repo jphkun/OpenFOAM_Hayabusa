@@ -185,47 +185,8 @@ class Hayabusa:
         point = np.array([x,y,z])
         return point
 
-    def test_circle(self):
-        p = []
-        x = []
-        y = []
-        z = []
-        X = []
-        Y = []
-        Z = []
-        alpha = np.deg2rad(2*2*np.arctan(2))
-        theta = np.deg2rad(180)
-        phi = np.deg2rad(90)
-        N = 21
-        for i in range(0,360,N):
-            angle = np.deg2rad(i)
-            point = self.circle_on_sphere(1, alpha, theta, phi, angle)
-            p.append(point)
-            x.append(point[0])
-            y.append(point[1])
-            z.append(point[2])
-            X.append((i/180)-1)
-            Y.append((i/180)-1)
-            Z.append((i/180)-1)
-
-        p1 = self.circle_on_sphere(1, alpha, theta, phi, np.deg2rad( 45))
-        p2 = self.circle_on_sphere(1, alpha, theta, phi, np.deg2rad(-45))
-        print(' ')
-        print(X)
-        print(np.zeros(N-3)+X)
-        plt.figure()
-        ax = plt.axes(projection='3d')
-        ax.scatter(x, y, z)
-        ax.scatter(p1[0],p1[1],p1[2],'or')
-        ax.scatter(p2[0],p2[1],p2[2],'ob')
-        ax.scatter(X, np.zeros(N-3), np.zeros(N-3))
-        ax.scatter(np.zeros(N-3), X, np.zeros(N-3))
-        ax.scatter(np.zeros(N-3), np.zeros(N-3), X)
-
-        plt.show()
-
-
     # TODO: Documentation
+    # TODO: Type defintion
     def point_circle_xaxis(self, og, r, theta):
         """
         Computes a point on a circle whoes central point is on the x axis
@@ -242,11 +203,24 @@ class Hayabusa:
         point = [x,y,z]
         return point
 
+    # TODO: Generaliste the a, b, c variables
+    # TODO: set them as inputs?
     @staticmethod
     def angle_conversion(alpha):
         """
         converts the angle form one reference frame to the other
+
+        Parameter
+        ---------
+        alpha: float
+            angle in the first/initial reference frame
+
+        Return
+        ------
+        theta: float
+            angle in the second/final reference frame
         """
+        # TODO: Generalize
         b = 200
         c = 80
         a = np.sqrt(b**2 + c**2 - 2*b*c*np.cos(alpha))
@@ -255,6 +229,7 @@ class Hayabusa:
 
 
     # TODO: make the return block documentation correct
+    # TODO: Documentation, look at how to do a class
     def block1_3d(self):
         """
         Constructs block 1 and return a block with edges.
@@ -307,7 +282,8 @@ class Hayabusa:
         self.block1.chop(1, count=10, c2c_expansion=1)
         self.block1.chop(2, count=10,  c2c_expansion=1)
 
-
+    # TODO: Documentation
+    # TODO: Logic semplification
     def block2_3d(self):
         """
 
@@ -380,7 +356,7 @@ class Hayabusa:
         self.block2.chop(1, count=10, c2c_expansion=1)
         self.block2.chop(2, count=10, c2c_expansion=1)
 
-
+    # TODO: Put this part into the main for code clarity
     def mesh_3D(self):
         """
 
