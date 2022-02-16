@@ -54,6 +54,7 @@ class Hayabusa:
             Number of mesh points in the "phi" direction
         """
         self.capsuleDia = 0.4
+        self.capsuleRad = self.capsuleDia/2
         self.rNpoints = rNpoints
         self.thetaNpoints = thetaNpoints
         self.phiNpoints = phiNpoints
@@ -230,57 +231,111 @@ class Hayabusa:
 
     # TODO: make the return block documentation correct
     # TODO: Documentation, look at how to do a class
+    # TODO: max 100 lines for this function
     def block1_3d(self):
         """
         Constructs block 1 and return a block with edges.
         """
-        rho = self.capsuleDia/2
+        # Center point of the sphere
         sphereOg = [0.08, 0, 0]
+
+        #######################################################################
+        # WARNING all the following points are in the negative x direction
+        # hence add 180 deg for the correct point description in spherical
+        # coordinates.
+        #######################################################################
+        # Angle between the XY plane the sphere origin and vertex 1 of the block
         block1Alpha = np.arcsin(1/4)
+        # Angle between the XZ plane the sphere origin and vertex 1 of the block
         block1Beta  = np.arcsin(1/4)
+        # Angle between the XY plane the MESH origin and vertex 4 of the block
         block1Theta = self.angle_conversion(block1Alpha)
+        # Angle between the XZ plane the MESH origin and vertex 4 of the block
         block1Phi   = self.angle_conversion(block1Beta)
 
+        # Vertex 0
+        alpha0 = np.pi   + block1Alpha
+        beta0  = np.pi/2 - block1Beta
+        blk1v0= self.point_on_sphere(self.capsuleRad, alpha0, beta0, sphereOg)
+        # Vertex 1
+        alpha1 = np.pi   - block1Alpha
+        beta1  = np.pi/2 - block1Beta
+        blk1v1 = self.point_on_sphere(self.capsuleRad, alpha1, beta1, sphereOg)
+        # Vertex 2
+        alpha2 = np.pi   - block1Alpha
+        beta2  = np.pi/2 + block1Beta
+        blk1v2 = self.point_on_sphere(self.capsuleRad, alpha2, beta2, sphereOg)
+        # Vertex 3
+        alpha3 = np.pi   + block1Alpha
+        beta3  = np.pi/2 + block1Beta
+        blk1v3 = self.point_on_sphere(self.capsuleRad, alpha3, beta3, sphereOg)
+        # Vertex 4
+        theta4 = np.pi   + block1Theta
+        phi4   = np.pi/2 - block1Phi
+        blk1v4 = self.point_on_ellipsoid(theta4, phi4)
+        # Vertex 5
+        theta5 = np.pi   - block1Theta
+        phi5   = np.pi/2 - block1Phi
+        blk1v5 = self.point_on_ellipsoid(theta5, phi5)
+        # Vertex 6
+        theta6 = np.pi   - block1Theta
+        phi6   = np.pi/2 + block1Phi
+        blk1v6 = self.point_on_ellipsoid(theta6, phi6)
+        # Vertex 7
+        theta7 = np.pi   + block1Theta
+        phi7   = np.pi/2 + block1Phi
+        blk1v7 = self.point_on_ellipsoid(theta7, phi7)
+
         # Block point definition
-        self.block1Points = [
-            self.point_on_sphere(rho, np.pi + block1Alpha, np.pi/2 - block1Beta, sphereOg),
-            self.point_on_sphere(rho, np.pi - block1Alpha, np.pi/2 - block1Beta, sphereOg),
-            self.point_on_sphere(rho, np.pi - block1Alpha, np.pi/2 + block1Beta, sphereOg),
-            self.point_on_sphere(rho, np.pi + block1Alpha, np.pi/2 + block1Beta, sphereOg),
-            self.point_on_ellipsoid( np.pi + block1Theta,  np.pi/2 - block1Phi),
-            self.point_on_ellipsoid( np.pi - block1Theta,  np.pi/2 - block1Phi),
-            self.point_on_ellipsoid( np.pi - block1Theta,  np.pi/2 + block1Phi),
-            self.point_on_ellipsoid( np.pi + block1Theta,  np.pi/2 + block1Phi),
+        self.block1Vertices= [
+            blk1v0, blk1v1, blk1v2, blk1v3, # Face 1
+            blk1v4, blk1v5, blk1v6, blk1v7, # Face 2?
         ]
 
-        for point in self.block1Points:
-            print(point)
+        # Arc defintions
+        #######################################################################
+        # WARNING: alpha is set to pi since the front of the capsule is set in
+        # the negative x direction
+        #######################################################################
+        edge01pnt = self.point_on_sphere( self.capsuleRad, np.pi,  beta1,   sphereOg)
+        edge12pnt = self.point_on_sphere( self.capsuleRad, alpha1, np.pi/2, sphereOg)
+        edge23pnt = self.point_on_sphere( self.capsuleRad, np.pi,  beta3,   sphereOg)
+        edge30pnt = self.point_on_sphere( self.capsuleRad, alpha3, np.pi/2, sphereOg)
 
-        # Edge defintions
-        angle45 = np.linspace(np.pi   + block1Phi,   np.pi   - block1Phi,   10), # Spline Edge
-        angle56 = np.linspace(np.pi/2 - block1Theta, np.pi/2 + block1Theta, 10), # Spline Edge
-        angle67 = np.linspace(np.pi   - block1Phi,   np.pi   + block1Phi,   10), # Spline Edge
-        angle74 = np.linspace(np.pi/2 + block1Theta, np.pi/2 - block1Theta, 10), # Spline Edge
+        # Spline defintions
+        N = 10 # Number of points for each spline defintion
+        # Computation of the angles at which to compute the interpolation point
+        # for the spline.
+        angles45 = np.linspace(theta4, theta5, N),
+        edge45pnts = [self.point_on_ellipsoid( i, phi4) for i in angles45[0]]
+
+        angles56 = np.linspace(phi5, phi6, N),
+        edge56pnts = [self.point_on_ellipsoid( theta5, i) for i in angles56[0]]
+
+        angles67 = np.linspace(theta6, theta7, N),
+        edge67pnts = [self.point_on_ellipsoid( i, phi6) for i in angles67[0]]
+
+        angles74 = np.linspace(phi7, phi4, N),
+        edge74pnts = [self.point_on_ellipsoid( theta7, i) for i in angles74[0]]
 
         self.block1Edges = [
-            Edge(0, 1, self.point_on_sphere(rho, np.pi,             np.pi/2-block1Beta, sphereOg)), # Arc Edge
-            Edge(1, 2, self.point_on_sphere(rho, np.pi-block1Alpha , np.pi/2           , sphereOg)), # Arc Edge
-            Edge(2, 3, self.point_on_sphere(rho, np.pi,             np.pi/2+block1Beta, sphereOg)), # Arc Edge
-            Edge(3, 0, self.point_on_sphere(rho, np.pi+block1Alpha, np.pi/2           , sphereOg)), # Arc Edge
-            Edge(4, 5, [self.point_on_ellipsoid( i, np.pi/2-block1Phi ) for i in angle45[0]]), # Spline Edge
-            Edge(5, 6, [self.point_on_ellipsoid( np.pi-block1Theta, i ) for i in angle56[0]]), # Spline Edge
-            Edge(6, 7, [self.point_on_ellipsoid( i, np.pi/2+block1Phi ) for i in angle67[0]]), # Spline Edge
-            Edge(7, 4, [self.point_on_ellipsoid( np.pi+block1Theta, i ) for i in angle74[0]]), # Spline Edge
+            Edge(0, 1, edge01pnt), # Arc edge
+            Edge(1, 2, edge12pnt), # Arc edge
+            Edge(2, 3, edge23pnt), # Arc edge
+            Edge(3, 0, edge30pnt), # Arc edge
+            Edge(4, 5, edge45pnts), # Spline edge
+            Edge(5, 6, edge56pnts), # Spline edge
+            Edge(6, 7, edge67pnts), # Spline edge
+            Edge(7, 4, edge74pnts), # Spline edge
         ]
 
-        self.block1 = Block.create_from_points(self.block1Points, self.block1Edges)
-        #block.set_patch(['left','right','front','back'], '')
+        self.block1 = Block.create_from_points(self.block1Vertices, self.block1Edges)
         self.block1.set_patch('top','inlet')
         self.block1.set_patch('bottom','wall')
 
         self.block1.chop(0, count=10, c2c_expansion=1)
         self.block1.chop(1, count=10, c2c_expansion=1)
-        self.block1.chop(2, count=10,  c2c_expansion=1)
+        self.block1.chop(2, count=10, c2c_expansion=1)
 
     # TODO: Documentation
     # TODO: Logic semplification

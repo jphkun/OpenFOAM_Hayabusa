@@ -1,4 +1,8 @@
+*.swp
 /classy_blocks
 /classy_blocks-master
 /classy_examples-main
 /case/constant
+case/log.blockMesh
+case/log.checkMesh
+case/log.setsToZones

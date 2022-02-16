@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 9-b456138dc4bc
 Exec   : blockMesh
-Date   : Feb 15 2022
-Time   : 18:18:53
+Date   : Feb 16 2022
+Time   : 10:49:07
 Host   : "computer"
-PID    : 5016
+PID    : 10827
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -73,8 +73,8 @@ Mesh Information
 ----------------
 Patches
 ----------------
-  patch 0 (start: 5500 size: 200) name: inlet
-  patch 1 (start: 5700 size: 200) name: wall
+  patch 0 (start: 5500 size: 200) name: wall
+  patch 1 (start: 5700 size: 200) name: inlet
   patch 2 (start: 5900 size: 600) name: defaultFaces
 
 End
