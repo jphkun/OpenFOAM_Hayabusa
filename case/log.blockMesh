@@ -8,9 +8,9 @@
 Build  : 9-b456138dc4bc
 Exec   : blockMesh
 Date   : Feb 16 2022
-Time   : 10:49:07
+Time   : 19:12:19
 Host   : "computer"
-PID    : 10827
+PID    : 28101
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -34,14 +34,14 @@ Creating block mesh topology
 --> FOAM Warning : 
     From function Foam::polyMesh::polyMesh(const Foam::IOobject&, Foam::pointField&&, const cellShapeList&, const faceListList&, const wordList&, const Foam::PtrList<Foam::dictionary>&, const Foam::word&, const Foam::word&, bool)
     in file meshes/polyMesh/polyMeshFromShapeMesh.C at line 873
-    Found 6 undefined faces in mesh; adding to default patch.
+    Found 8 undefined faces in mesh; adding to default patch.
 
 Check topology
 
 	Basic statistics
-		Number of internal faces : 1
-		Number of boundary faces : 10
-		Number of defined boundary faces : 10
+		Number of internal faces : 0
+		Number of boundary faces : 12
+		Number of defined boundary faces : 12
 		Number of undefined boundary faces : 0
 	Checking patch -> block consistency
 
@@ -57,25 +57,25 @@ Creating points with scale 1
         j : 0.0101061 .. 0.0101061 0.0101004 0.0419992 .. 0.0419992 0.0418764 .. 0.0418764 
         k : 0.387195 .. 0.387195 0.387315 .. 0.387315 0.387312 .. 0.387312 0.3871 .. 0.3871 
     Block 1 cell size :
-        i : 0.0188302 .. 0.0188302 0.0177519 .. 0.0177519 0.0692436 .. 0.0692436 0.0653673 .. 0.0653673 
-        j : 0.00576518 .. 0.00576518 0.0064941 .. 0.00634099 0.0197656 .. 0.0197138 0.0221974 .. 0.0219211 
-        k : 0.385595 .. 0.385595 0.385597 .. 0.385597 0.384897 0.384252 .. 0.384252 
+        i : 0.0251069 .. 0.0251069 0.0236558 .. 0.0236558 0.0602566 .. 0.0602566 0.0577695 .. 0.0577695 
+        j : 0.0134897 .. 0.0134897 0.0136438 .. 0.0133125 0.0210784 .. 0.0212056 0.0212712 .. 0.0210124 
+        k : 0.38734 .. 0.38734 0.38734 .. 0.38734 0.387189 .. 0.387189 0.387174 .. 0.387174 
 
 Writing polyMesh
 ----------------
 Mesh Information
 ----------------
-  boundingBox: (-3.97131 -2.35339 -1.6108) (-0.08 2.35339 3.2)
-  nPoints: 2541
+  boundingBox: (-3.97131 -1.69706 -1.6108) (-0.04 1.69706 2.4)
+  nPoints: 2662
   nCells: 2000
-  nFaces: 6500
-  nInternalFaces: 5500
+  nFaces: 6600
+  nInternalFaces: 5400
 ----------------
 Patches
 ----------------
-  patch 0 (start: 5500 size: 200) name: wall
-  patch 1 (start: 5700 size: 200) name: inlet
-  patch 2 (start: 5900 size: 600) name: defaultFaces
+  patch 0 (start: 5400 size: 200) name: inlet
+  patch 1 (start: 5600 size: 200) name: wall
+  patch 2 (start: 5800 size: 800) name: defaultFaces
 
 End
 

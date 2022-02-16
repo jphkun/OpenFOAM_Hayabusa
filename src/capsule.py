@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import os
+
+from scipy.spatial.transform import Rotation as R
+
 from classy_blocks.classes.mesh import Mesh
 from classy_blocks.classes.operations import Extrude, Face, Revolve
 from classy_blocks.classes import operations
@@ -22,6 +25,7 @@ from classy_blocks.classes.block import Block
 from classy_blocks.classes.primitives import Edge
 
 from classy_blocks.util import functions as f
+
 
 # TODO create a logger class
 # TODO: Finish the circle function
@@ -147,7 +151,7 @@ class Hayabusa:
             print('Point_on_ellipsoid: Error with phi and theta, they are not in the correct range')
             sys.exit()
 
-        point = np.array([x,y,z])
+        point = [x,y,z]
         return point
 
 
@@ -338,12 +342,45 @@ class Hayabusa:
         self.block1.chop(2, count=10, c2c_expansion=1)
 
     # TODO: Documentation
+    def init_3d_plot(self):
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(projection='3d')
+
+    # TODO: Documentation
+    def plot_points(self, pnts, c):
+        #print(' ')
+        #print(pnts)
+        #print(pnts[0][:])
+        #print(' ')
+        #for pnt in pnts:
+        #    print(pnt)
+        #    self.ax.scatter(pnt[0], pnt[1], pnt[2], color=c)
+
+        # To make the graph kind of equal
+        dst = 3.5
+        N = 25
+        x = np.linspace(0, dst, N)
+        self.ax.scatter( dst, 0.0, 0.0, color='w')
+        self.ax.scatter(-dst, 0.0, 0.0, color='w')
+        self.ax.scatter( 0.0, dst, 0.0, color='w')
+        self.ax.scatter( 0.0,-dst, 0.0, color='w')
+        self.ax.scatter( 0.0, 0.0, dst, color='w')
+        self.ax.scatter( 0.0, 0.0,-dst, color='w')
+        self.ax.scatter( x, np.zeros(N), np.zeros(N), color='k')
+
+    # TODO: Documentation
+    def show_plot(self):
+        plt.show()
+
+    # TODO: Documentation
     # TODO: Logic semplification
+    # TODO: Generalize the sphere origin
     def block2_3d(self):
         """
 
         """
-
+        #######################################################################
+        # Old code
         rho = self.capsuleDia/2
         sphereOg = [0.08, 0, 0]
         block1Alpha = np.arcsin(1/4)
@@ -358,51 +395,131 @@ class Hayabusa:
         gamma = np.deg2rad(180)
         t1 = np.deg2rad(-45+180)
         t2 = np.deg2rad(45+180)
-
         alpha2 = self.angle_conversion(alpha)
-        # TODO: change the point_on_sphere function by circle_on_sphere
+        #######################################################################
+
+        # New code
+        #######################################################################
+        # WARNING all the following points are in the negative x direction
+        # hence add 180 deg for the correct point description in spherical
+        # coordinates.
+        #######################################################################
+        # Capsules points bottom
+        # Angle between the XY plane the sphere origin and vertex 3 of the block 1
+        block2AlphaBot1 = np.arcsin(1/4)
+        block2AlphaBot2 = np.pi + block2AlphaBot1
+        print(f'block2AlphaBot [deg]: {np.rad2deg(block2AlphaBot1)}')
+        print(f'block2ThetaBot [deg]: {np.rad2deg(block2AlphaBot2)}')
+        # Angle between the XZ plane the sphere origin and vertex 3 of the block 1
+        block2BetaBot1 = np.arcsin(1/4)
+        block2BetaBot2 = np.pi/2 - block2BetaBot1 # To be used in point_on_sphere
+        print(f'block2BetaBot [deg]: {np.rad2deg(block2BetaBot1)}')
+        print(f'block2PhiBot  [deg]: {np.rad2deg(block2BetaBot2)}')
+
+        # Inlet points
+        # Angle between the XY plane the MESH origin and vertex 7? 4? of the block 1
+        block2ThetaBot1 = self.angle_conversion(block2AlphaBot1)
+        block2ThetaBot2 = np.pi + block2ThetaBot1
+        print(f'block2ThetaBot1 [deg]: {np.rad2deg(block2ThetaBot1)}')
+        print(f'block2ThetaBot2 [deg]: {np.rad2deg(block2ThetaBot2)}')
+        # Angle between the XZ plane the MESH origin and vertex 7? 4? of the block 1
+        block2PhiBot1 = self.angle_conversion(block2BetaBot1)
+        block2PhiBot2 = np.pi/2 - block2PhiBot1 # To use in point_on_ellipsoid
+        print(f'block2PhiBot1 [deg]: {np.rad2deg(block2PhiBot1)}')
+        print(f'block2PhiBot2 [deg]: {np.rad2deg(block2PhiBot2)}')
+
+        # Capsule points top
+        # Angle between teh XY plane, the sphere origin, and the center point
+        # of the edge between vertex 1 and vertex 2.
+        block2BetaTop1 = np.pi - 2 * np.arctan(2)
+        block2BetaTop2 = np.pi - 2 * np.arctan(3)
+        block2PhiTop1 = np.pi/2 - block2BetaTop1
+        block2PhiTop2 = np.pi/2 - block2BetaTop2
+        print(f'block2beta1 [deg]: {np.rad2deg(block2BetaTop1)}')
+        print(f'block2Beta2 [deg]: {np.rad2deg(block2BetaTop2)}')
+        print(f'block2Phi1 [deg]: {np.rad2deg(block2PhiTop1)}')
+        print(f'block2Phi2 [deg]: {np.rad2deg(block2PhiTop2)}')
+
+        # Computation of 10 angles "central point" between the edges01 and edges 45
+        N = 10
+        anglesCapsule0 = np.linspace(np.pi/2, block2BetaBot2, N)
+        anglesCapsule1 = np.linspace(block2BetaTop2, block2BetaBot2, N) # From "Top" to "Bottom"
+        print(f'anglesCapsule0 [deg]: {np.rad2deg(anglesCapsule0)}')
+        print(f'anglesCapsule1 [deg]: {np.rad2deg(anglesCapsule1)}')
+
+        anglesInlet0 = np.linspace(block2PhiBot2, np.pi/2, N)
+        anglesInlet1 = np.linspace(block2PhiTop2, block2PhiBot2, N)
+        anglesInlet2 = np.linspace(0, block2PhiTop2, N)
+        print(f'anglesInlet [deg]: {np.rad2deg(anglesInlet0)}')
+        print(f'anglesInlet [deg]: {np.rad2deg(anglesInlet1)}')
+        print(f'anglesInlet [deg]: {np.rad2deg(anglesInlet2)}')
+
+        # Central points on wall/capsule
+        ccPnts0 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule0]
+        ccPnts1 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule1]
+        # Outside central points, on external mesh
+        icPnts0 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet0]
+        icPnts1 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet1]
+        icPnts2 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet2]
+
+
+        self.init_3d_plot()
+        self.plot_points(ccPnts0,'r')
+        self.plot_points(ccPnts1,'g')
+
+        self.plot_points(icPnts0,'r')
+        self.plot_points(icPnts1,'g')
+        self.plot_points(icPnts2,'b')
+
+        # Points rotation
+        negRot = np.deg2rad(180+45)
+        posRot = np.deg2rad(180-45)
+        vec = [0, 0, 1]
+        neg45 = R.from_quat([np.cos(negRot/2),
+                             vec[0]*np.sin(negRot/2),
+                             vec[1]*np.sin(negRot/2),
+                             vec[2]*np.sin(negRot/2)])
+        pos45 = R.from_quat([np.cos(posRot/2),
+                             vec[0]*np.sin(posRot/2),
+                             vec[1]*np.sin(posRot/2),
+                             vec[2]*np.sin(posRot/2)])
+
+        capsuleBackPnts = pos45.apply(ccPnts1)
+        capsuleFrontPnts= neg45.apply(ccPnts1)
+        inletBackPnts   = pos45.apply(icPnts1)
+        inletFrontPnts  = neg45.apply(icPnts1)
+
+        # TODO: Block vertices
+        blk2v0 = capsuleBackPnts[ 0]
+        blk2v1 = capsuleFrontPnts[ 0]
+        blk2v2 = capsuleFrontPnts[-1]
+        blk2v3 = capsuleBackPnts[-1]
+        blk2v4 = inletBackPnts[ 0]
+        blk2v5 = inletFrontPnts[ 0]
+        blk2v6 = inletFrontPnts[-1]
+        blk2v7 = inletBackPnts[-1]
+        # TODO: Radius points
+        # TODO: Splines points
+
+        self.plot_points(capsuleFrontPnts, 'r')
+        self.plot_points(capsuleBackPnts, 'b')
+
         self.block2Points = [
-            self.circle_on_sphere(rho, alpha, beta, gamma, t1) + sphereOg,
-            self.circle_on_sphere(rho, alpha, beta, gamma, t2) + sphereOg,
-            self.point_on_sphere(rho, np.pi - block1Alpha, np.pi/2 - block1Beta, sphereOg),
-            self.point_on_sphere(rho, np.pi + block1Alpha, np.pi/2 - block1Beta, sphereOg),
-
-            self.point_on_ellipsoid((5/4)*np.pi, alpha2),
-            self.point_on_ellipsoid((3/4)*np.pi, alpha2),
-            self.point_on_ellipsoid( np.pi - block1Theta,  np.pi/2 - block1Phi),
-            self.point_on_ellipsoid( np.pi + block1Theta,  np.pi/2 - block1Phi),
+            blk2v0, blk2v1, blk2v2, blk2v3,
+            blk2v4, blk2v5, blk2v6, blk2v7,
         ]
-        for point in self.block2Points:
-            print(point)
-
-        # angle on the XZ plane between the leading edge of block2 and the
-        # trailing edge of block2 (leading edge of block 6 7 8 or 9 TBD)
-        angles = np.linspace(alpha2, alpha ,3)
-        center_points = []
-        radiuses = []
-        edge_1 = []
-        edge_2 = []
-
-        for ang in angles:
-            p = self.point_on_ellipsoid(np.deg2rad(180), ang)
-            r = np.linalg.norm(p[1:])
-            radiuses.append(r)
-            c = [p[0], 0, 0]
-            center_points.append(c)
-            pe1 = self.point_circle_xaxis(c, r, np.deg2rad(45))
-            edge_1.append(pe1)
-
-            pe2 = self.point_circle_xaxis(c, r, np.deg2rad(-45))
-            edge_2.append(pe2)
 
         self.block2Edges = [
-            Edge(0,1, self.circle_on_sphere(rho,     alpha, beta, gamma, np.deg2rad(180))+sphereOg), # Arc Edge
-            Edge(1,2, self.circle_on_sphere(rho,0.75*alpha, beta, gamma, np.deg2rad(180+45))+sphereOg), # Arc Edge
-            Edge(3,0, self.circle_on_sphere(rho,0.75*alpha, beta, gamma, np.deg2rad(180-45))+sphereOg), # Arc Edge
-            Edge(4,5, self.point_circle_xaxis(center_points[-1], r, 0)), # Arc Edge
-            Edge(5,6, [edge_1[1]]), # Spline Edge
-            Edge(7,4, [edge_2[1]]), # Spline Edge
+            Edge(0, 1, ccPnts1[0]),          # Arc Edge
+            Edge(1, 2, capsuleFrontPnts[4]), # Arc Edge
+            Edge(2, 3, ccPnts1[-1]),         # Arc Edge TODO: Correct edge in block1
+            Edge(3, 0, capsuleBackPnts[4]),  # Arc Edge
+            Edge(4, 5, icPnts1[0]),     # Arc Edge
+            Edge(5, 6, inletFrontPnts), # Spline Edge
+            Edge(6, 7, icPnts1[-1]),    # Spline Edge TODO: Correct edge in block1
+            Edge(7, 4, inletBackPnts[::-1]),  # Spline Edge
         ]
+
         self.block2 = Block.create_from_points(self.block2Points, self.block2Edges)
         self.block2.set_patch('top','inlet')
         self.block2.set_patch('bottom','wall')
