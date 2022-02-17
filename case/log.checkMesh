@@ -8,9 +8,9 @@
 Build  : 9-b456138dc4bc
 Exec   : checkMesh -constant
 Date   : Feb 16 2022
-Time   : 19:12:19
+Time   : 19:29:51
 Host   : "computer"
-PID    : 28102
+PID    : 28510
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
