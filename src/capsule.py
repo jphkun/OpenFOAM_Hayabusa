@@ -38,6 +38,9 @@ from classy_blocks.util import functions as f
 
 class Hayabusa:
 
+    # TODO: Connect the capsuleDia input into the class
+    # TODO: Verify that the main.py file has the correct input
+
     def __init__(self,
                  capsuleDia: float,
                  rNpoints: int,
@@ -59,6 +62,7 @@ class Hayabusa:
         """
         self.capsuleDia = 0.4
         self.capsuleRad = self.capsuleDia/2
+        self.capsuleSphereCenter = [self.capsuleDia/5, 0, 0]
         self.rNpoints = rNpoints
         self.thetaNpoints = thetaNpoints
         self.phiNpoints = phiNpoints
@@ -75,6 +79,7 @@ class Hayabusa:
 
 
     # TODO: Wring type hinting output
+
     def point_on_sphere(self, rho: float, theta: float, phi: float, origin=[0,0,0]) -> None:
         """
         Returns a point [x,y,z] array of the asked point on the sphere
@@ -112,6 +117,7 @@ class Hayabusa:
 
 
     # TODO: Wrong type hinting output
+
     def point_on_ellipsoid(self, theta: float, phi: float) -> None:
         """
         Returns a surface point of the ellipsoid that constitutes the O mesh.
@@ -156,6 +162,7 @@ class Hayabusa:
 
 
     # TODO: Change the None in a vector
+
     def circle_on_sphere(self, rho:float, alpha:float, beta:float, gamma:float, t:float) -> None:
         """
         https://math.stackexchange.com/questions/643130/circle-on-sphere
@@ -192,6 +199,7 @@ class Hayabusa:
 
     # TODO: Documentation
     # TODO: Type defintion
+
     def point_circle_xaxis(self, og, r, theta):
         """
         Computes a point on a circle whoes central point is on the x axis
@@ -210,6 +218,7 @@ class Hayabusa:
 
     # TODO: Generaliste the a, b, c variables
     # TODO: set them as inputs?
+
     @staticmethod
     def angle_conversion(alpha):
         """
@@ -236,6 +245,7 @@ class Hayabusa:
     # TODO: make the return block documentation correct
     # TODO: Documentation, look at how to do a class
     # TODO: max 100 lines for this function
+
     def block1_3d(self):
         """
         Constructs block 1 and return a block with edges.
@@ -347,17 +357,25 @@ class Hayabusa:
         self.block1.chop(1, count=10, c2c_expansion=1)
         self.block1.chop(2, count=10, c2c_expansion=1)
 
-    # TODO: Documentation
     def init_3d_plot(self):
+        """
+        Initialises a plot instance. This permits to plot multtiple points
+        accross multiple functions
+        """
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(projection='3d')
 
-    # TODO: Documentation
+
     def plot_points(self, pnts, c):
-        #print(' ')
-        #print(pnts)
-        #print(pnts[0][:])
-        #print(' ')
+        """
+        Plots the points with a color
+
+        Parameters:
+        pnts: array
+            Point in 3D space so something like [[x1, y1, z1], ...]
+        c: str
+            Color of the point. Some examples: 'r', 'g', 'b', 'k', 'c', 'm'
+        """
         for pnt in pnts:
             print(pnt)
             self.ax.scatter(pnt[0], pnt[1], pnt[2], color=c)
@@ -374,9 +392,12 @@ class Hayabusa:
         self.ax.scatter( 0.0, 0.0,-dst, color='w')
         self.ax.scatter( x, np.zeros(N), np.zeros(N), color='k')
 
-    # TODO: Documentation
     def show_plot(self):
+        """
+        Shows the plot when python code is launched through terminal
+        """
         plt.show()
+
 
     # TODO: Documentation
     def point_on_straight_front(self, x):
@@ -414,11 +435,11 @@ class Hayabusa:
 
     # TODO: Documentation
     # TODO: Logic semplification
-    # TODO: Generalize the sphere origin
     def section_points(self):
         """
 
         """
+        # TODO: Generalize the sphere origin
         sphereOg = [0.08, 0, 0]
         print(2*'\n')
         # New code
@@ -478,20 +499,23 @@ class Hayabusa:
         print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet2)}')
 
         # Central points on wall/capsule
+
         # Front of the capsule
-        ccPnts0 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule0]
-        ccPnts1 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule1]
-        xFront = np.linspace(ccPnts1[0][0], 0, N)
-        # TODO: Generalise the 0.08 (origin of the front sphere)
-        xBack  = np.linspace(0, 0.08, N)
-        """
-        for pnt in ccPnts1:
-            print(pnt)
-        """
-        ccPnts2 = [self.point_on_straight_front(x) for x in xFront]
+        # Section 0
+        self.ccPnts0 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule0]
+        # Section 1
+        self.ccPnts1 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule1]
+        # Section 2
+        xFront = np.linspace(self.ccPnts1[0][0], 0, N)
+        self.ccPnts2 = [self.point_on_straight_front(x) for x in xFront]
+
         # Back of the capsule
-        ccPnts3 = [self.point_on_straight_back(x) for x in xBack]
-        ccPnts4 = []
+        # Section 3
+        xBack  = np.linspace(0, sphereOg[0], N)
+        self.ccPnts3 = [self.point_on_straight_back(x) for x in xBack]
+        # TODO:
+        self.ccPnts4 = []
+        self.ccPnts5 = []
 
         """
         plt.figure()
@@ -508,12 +532,18 @@ class Hayabusa:
 
         # Outside central points, on external mesh
         # Front points
-        icPnts0 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet0]
-        icPnts1 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet1]
-        icPnts2 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet2]
+        # Section 0
+        self.iocPnts0 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet0]
+        # Section 1
+        self.iocPnts1 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet1]
+        # Section 2
+        self.iocPnts2 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet2]
         # Back of the capsule
-        icPnts3 = []
-        icPnts4 = []
+        # TODO: compute the final phi angle for section 3
+        # Section 3
+        self.iocPnts3 = []
+        self.iocPnts4 = []
+        self.iocPnts5 = []
 
         """
         self.init_3d_plot()
@@ -524,13 +554,6 @@ class Hayabusa:
         self.plot_points(ccPnts4,'m')
         self.show_plot()
         """
-
-        # TODO: add points for blocks 6-9
-        # TODO: add points for blocks 10-13
-        # TODO: add points for blocks 14-17
-        # TODO: add points for blocks 18
-
-        self.init_3d_plot()
         """
         self.plot_points(ccPnts0,'r')
         self.plot_points(ccPnts1,'g')
@@ -539,6 +562,8 @@ class Hayabusa:
         self.plot_points(icPnts1,'g')
         self.plot_points(icPnts2,'b')
         """
+
+
     def rotation_vector(self, e, rot):
         """
         Returns a rotation vector for quaternions.
@@ -557,9 +582,9 @@ class Hayabusa:
         """
         vector = [
             np.cos(rot/2),
-            eX[0]*np.sin(rot/2),
-            eX[1]*np.sin(rot/2),
-            eX[2]*np.sin(rot/2),
+            e[0]*np.sin(rot/2),
+            e[1]*np.sin(rot/2),
+            e[2]*np.sin(rot/2),
         ]
         return vector
 
@@ -570,66 +595,222 @@ class Hayabusa:
         """
         # Rotation construction 
         quadrant1Angle = np.deg2rad( 45)
+        quadrant1cAngle= np.deg2rad(  0)
         quadrant2Angle = np.deg2rad(135)
+        quadrant2cAngle= np.deg2rad( 90)
         quadrant3Angle = np.deg2rad(225)
+        quadrant3cAngle= np.deg2rad(180)
         quadrant4Angle = np.deg2rad(315)
+        quadrant4cAngle= np.deg2rad(270)
 
         # Unit x vector
         eX = [0, 0, 1]
 
         # Rotation vector for quaternions
         quaternionRotation1 = self.rotation_vector(eX, quadrant1Angle)
+        quaternionRotationC1= self.rotation_vector(eX, quadrant1cAngle)
         quaternionRotation2 = self.rotation_vector(eX, quadrant2Angle)
+        quaternionRotationC2= self.rotation_vector(eX, quadrant2cAngle)
         quaternionRotation3 = self.rotation_vector(eX, quadrant3Angle)
+        quaternionRotationC3= self.rotation_vector(eX, quadrant3cAngle)
         quaternionRotation4 = self.rotation_vector(eX, quadrant4Angle)
+        quaternionRotationC4= self.rotation_vector(eX, quadrant4cAngle)
 
-        # Quaternion rotation functions defined
-        rotQuat1 = R.from_quat(quaternionRotation1)
-        rotQuat2 = R.from_quat(quaternionRotation2)
-        rotQuat3 = R.from_quat(quaternionRotation3)
-        rotQuat4 = R.from_quat(quaternionRotation4)
+        # Quaternion self.rotation functions defined
+        self.rotQuat1 = R.from_quat(quaternionRotation1)
+        self.rotQuatC1= R.from_quat(quaternionRotationC1)
+        self.rotQuat2 = R.from_quat(quaternionRotation2)
+        self.rotQuatC2= R.from_quat(quaternionRotationC2)
+        self.rotQuat3 = R.from_quat(quaternionRotation3)
+        self.rotQuatC3= R.from_quat(quaternionRotationC3)
+        self.rotQuat4 = R.from_quat(quaternionRotation4)
+        self.rotQuatC4= R.from_quat(quaternionRotationC4)
 
-        # Saves the rotated construction points
+        # Saves the self.rotated capsule construction points
         # Section 0
-        self.capsuleSection0quad1 = rotQuat1.apply(ccPnts0)
-        self.capsuleSection0quad2 = rotQuat2.apply(ccPnts0)
-        self.capsuleSection0quad3 = rotQuat3.apply(ccPnts0)
-        self.capsuleSection0quad4 = rotQuat4.apply(ccPnts0)
+        self.capsuleSection0quad1 = self.rotQuat1.apply(self.ccPnts0)
+        self.capsuleSection0quad2 = self.rotQuat2.apply(self.ccPnts0)
+        self.capsuleSection0quad3 = self.rotQuat3.apply(self.ccPnts0)
+        self.capsuleSection0quad4 = self.rotQuat4.apply(self.ccPnts0)
         # Section 1
-        self.capsuleSection1quad1 = rotQuat1.apply(ccPnts1)
-        self.capsuleSection1quad2 = rotQuat2.apply(ccPnts1)
-        self.capsuleSection1quad3 = rotQuat3.apply(ccPnts1)
-        self.capsuleSection1quad4 = rotQuat4.apply(ccPnts1)
+        self.capsuleSection1quad1 = self.rotQuat1.apply(self.ccPnts1)
+        self.capsuleSection1quadC1= self.rotQuatC1.apply(self.ccPnts1)
+        self.capsuleSection1quad2 = self.rotQuat2.apply(self.ccPnts1)
+        self.capsuleSection1quadC2= self.rotQuatC2.apply(self.ccPnts1)
+        self.capsuleSection1quad3 = self.rotQuat3.apply(self.ccPnts1)
+        self.capsuleSection1quadC3= self.rotQuatC3.apply(self.ccPnts3)
+        self.capsuleSection1quad4 = self.rotQuat4.apply(self.ccPnts1)
+        self.capsuleSection1quadC4= self.rotQuatC4.apply(self.ccPnts1)
         # Section 2
-        self.capsuleSection2quad1 = rotQuat1.apply(ccPnts2)
-        self.capsuleSection2quad2 = rotQuat2.apply(ccPnts2)
-        self.capsuleSection2quad3 = rotQuat3.apply(ccPnts2)
-        self.capsuleSection2quad4 = rotQuat4.apply(ccPnts2)
+        self.capsuleSection2quad1 = self.rotQuat1.apply(self.ccPnts2)
+        self.capsuleSection2quad2 = self.rotQuat2.apply(self.ccPnts2)
+        self.capsuleSection2quad3 = self.rotQuat3.apply(self.ccPnts2)
+        self.capsuleSection2quad4 = self.rotQuat4.apply(self.ccPnts2)
         # Section 3
-        self.capsuleSection3quad1 = rotQuat1.apply(ccPnts3)
-        self.capsuleSection3quad2 = rotQuat2.apply(ccPnts3)
-        self.capsuleSection3quad3 = rotQuat3.apply(ccPnts3)
-        self.capsuleSection3quad4 = rotQuat4.apply(ccPnts3)
+        self.capsuleSection3quad1 = self.rotQuat1.apply(self.ccPnts3)
+        self.capsuleSection3quad2 = self.rotQuat2.apply(self.ccPnts3)
+        self.capsuleSection3quad3 = self.rotQuat3.apply(self.ccPnts3)
+        self.capsuleSection3quad4 = self.rotQuat4.apply(self.ccPnts3)
         # Section 4
+        # Section 5
 
-    def block1(self):
-        """
-        """
-        pass
+        # Saves the rotated inlet construction points
+        # Section 0
+        self.ioSection0quad1 = self.rotQuat1.apply(self.iocPnts0)
+        self.ioSection0quad2 = self.rotQuat2.apply(self.iocPnts0)
+        self.ioSection0quad3 = self.rotQuat3.apply(self.iocPnts0)
+        self.ioSection0quad4 = self.rotQuat4.apply(self.iocPnts0)
 
-    def block2(self):
+        # Section 1
+        self.ioSection1quad1 = self.rotQuat1.apply(self.iocPnts1)
+        self.ioSection1quadC1= self.rotQuatC1.apply(self.iocPnts1)
+        self.ioSection1quad2 = self.rotQuat2.apply(self.iocPnts1)
+        self.ioSection1quadC2= self.rotQuatC2.apply(self.iocPnts1)
+        self.ioSection1quad3 = self.rotQuat3.apply(self.iocPnts1)
+        self.ioSection1quadC3= self.rotQuatC3.apply(self.iocPnts1)
+        self.ioSection1quad4 = self.rotQuat4.apply(self.iocPnts1)
+        self.ioSection1quadC4= self.rotQuatC4.apply(self.iocPnts1)
+
+        # Section 2
+        self.ioSection2quad1 = self.rotQuat1.apply(self.iocPnts2)
+        self.ioSection2quad2 = self.rotQuat2.apply(self.iocPnts2)
+        self.ioSection2quad3 = self.rotQuat3.apply(self.iocPnts2)
+        self.ioSection2quad4 = self.rotQuat4.apply(self.iocPnts2)
+        # Section 3
+        # Section 4
+        # Section 5
+
+    def compute_angles(self, p1, e):
+        """
+        Returns
+        -------
+        angle: float
+            angle between the point and the vector e
+        """
+
+    def build_block1(self):
+        """
+        Computes vertices and point in order to build block 1.
+        """
+        # Computes vertices for block 1
+        blk1v0 = self.capsuleSection0quad1[-1]
+        blk1v1 = self.capsuleSection0quad2[-1]
+        blk1v2 = self.capsuleSection0quad3[-1]
+        blk1v3 = self.capsuleSection0quad4[-1]
+        blk1v4 = self.ioSection0quad1[0]
+        blk1v5 = self.ioSection0quad2[0]
+        blk1v6 = self.ioSection0quad3[0]
+        blk1v7 = self.ioSection0quad4[0]
+
+        self.block1Points = [
+            blk1v0, blk1v1, blk1v2, blk1v3,
+            blk1v4, blk1v5, blk1v6, blk1v7,
+        ]
+
+        # Computes Alpha and Beta for the capsule surface
+        # First we need the angle
+        vCapsuleFront  = blk1v1 - self.capsuleSphereCenter
+        vCapsuleFrontXY = [vCapsuleFront[0], vCapsuleFront[1], 0]
+        # Since eX = [1, 0, 0] the angle can be easily found in the following way
+        alphaCapsule = np.arccos(vCapsuleFrontXY[0] / np.linalg.norm(vCapsuleFrontXY))
+        # Since eZ = [0, 0, 1] the angle can be easily found in the following way
+        betaCapsule   = np.arccos(vCapsuleFront[2] / np.linalg.norm(vCapsuleFront))
+
+        # Computes Theta and Phi for the inlet surface
+        vInletFront   = blk1v5
+        vInletFrontXY = [vInletFront[0], vInletFront[1], 0]
+        # Since eX = [1, 0, 0] the angle can be easily found in the following way
+        thetaInlet = np.arccos(vInletFrontXY[0] / np.linalg.norm(vInletFrontXY))
+        # Since eZ = [0, 0, 1] the angle can be easily found in the following way
+        phiInlet   = np.arccos(vInletFront[2]   / np.linalg.norm(vInletFront))
+
+        # TODO: Implement a test for this
+        """
+        # Test to see if the angles found in spherical coordiantes are correct
+        p = self.point_on_sphere(
+            rho   = self.capsuleRad,
+            theta = alphaCapsule,
+            phi   = betaCapsule,
+            origin= self.capsuleSphereCenter)
+        print(f'p:             {p}')
+        print(f'vCapsuleFront: {blk1v2}')
+
+        p = self.point_on_ellipsoid(thetaInlet, phiInlet)
+        print(f'p:  {p}')
+        print(f'vInletBack:    {vInletBack}')
+        """
+
+        N = 10
+        theta  = np.pi - thetaInlet
+        thetaMin = np.pi + theta
+        thetaMax = np.pi - theta
+        angles = np.linspace(thetaMin, thetaMax, N)
+
+        # Arc edges on capsule surface
+        block1CapsuleCenterPoint = self.point_on_sphere(
+            rho   = self.capsuleRad,
+            theta = np.pi,
+            phi   = betaCapsule,
+            origin= self.capsuleSphereCenter)
+        # Rotates the point. This point will be used as center point of the
+        # edges in order to build a arc edge on the capsule surface.
+        c1 = self.rotQuatC1.apply(block1CapsuleCenterPoint)
+        c2 = self.rotQuatC2.apply(block1CapsuleCenterPoint)
+        c3 = self.rotQuatC3.apply(block1CapsuleCenterPoint)
+        c4 = self.rotQuatC4.apply(block1CapsuleCenterPoint)
+
+        # Spline edges for the inlet surface
+        c5 = [] # Spline points for ege 56
+        c6 = [] # Spline points for ege 67
+        c7 = [] # Spline points for ege 74
+        c8 = [] # Spline points for ege 45
+
+        for theta in angles:
+            point = self.point_on_ellipsoid(theta, phiInlet)
+
+            tmp = self.rotQuatC1.apply(point)
+            c5.append(tmp)
+            tmp = self.rotQuatC2.apply(point)
+            c6.append(tmp)
+            tmp = self.rotQuatC3.apply(point)
+            c7.append(tmp)
+            tmp = self.rotQuatC4.apply(point)
+            c8.append(tmp)
+
+        self.block1Edges = [
+            Edge(0, 1, c2), # Arc Edge
+            Edge(1, 2, c3), # Arc Edge
+            Edge(2, 3, c4), # Arc Edge
+            Edge(3, 0, c1), # Arc Edge
+            Edge(7, 4, c5), # Spline Edge
+            Edge(4, 5, c6), # Spline Edge
+            Edge(5, 6, c7), # Spline Edge
+            Edge(6, 7, c8), # Spline Edge
+        ]
+
+        self.block1 = Block.create_from_points(self.block1Points, self.block1Edges)
+        self.block1.set_patch('top','inlet')
+        self.block1.set_patch('bottom','wall')
+
+        self.block1.chop(0, count=10, c2c_expansion=1)
+        self.block1.chop(1, count=10, c2c_expansion=1)
+        self.block1.chop(2, count=10, c2c_expansion=1)
+        self.show_plot()
+
+
+    def build_block2(self):
+        """
+
+        """
         # Computes vertices for block 2
-        blk2v0 = capsuleBackPnts[ 0]
-        blk2v1 = capsuleFrontPnts[ 0]
-        blk2v2 = capsuleFrontPnts[-1]
-        blk2v3 = capsuleBackPnts[-1]
-        blk2v4 = inletBackPnts[ 0]
-        blk2v5 = inletFrontPnts[ 0]
-        blk2v6 = inletFrontPnts[-1]
-        blk2v7 = inletBackPnts[-1]
-
-        self.plot_points(capsuleFrontPnts, 'r')
-        self.plot_points(capsuleBackPnts, 'b')
+        blk2v0 = self.capsuleSection1quad1[-1]
+        blk2v1 = self.capsuleSection1quad4[-1]
+        blk2v2 = self.capsuleSection1quad4[0]
+        blk2v3 = self.capsuleSection1quad1[0]
+        blk2v4 = self.ioSection1quad1[-1]
+        blk2v5 = self.ioSection1quad4[-1]
+        blk2v6 = self.ioSection1quad4[0]
+        blk2v7 = self.ioSection1quad1[0]
 
         self.block2Points = [
             blk2v0, blk2v1, blk2v2, blk2v3,
@@ -637,14 +818,12 @@ class Hayabusa:
         ]
 
         self.block2Edges = [
-            Edge(0, 1, ccPnts1[0]),          # Arc Edge
-            Edge(1, 2, capsuleFrontPnts[4]), # Arc Edge
-            Edge(2, 3, ccPnts1[-1]),         # Arc Edge TODO: Correct edge in block1
-            Edge(3, 0, capsuleBackPnts[4]),  # Arc Edge
-            Edge(4, 5, icPnts1[0]),          # Arc Edge
-            Edge(5, 6, inletFrontPnts),      # Spline Edge
-            Edge(6, 7, icPnts1[-1]),         # Spline Edge TODO: Correct edge in block1
-            Edge(7, 4, inletBackPnts[::-1]), # Spline Edge
+            Edge(1, 2, self.capsuleSection1quad4[4]),  # Arc Edge
+            Edge(2, 3, self.capsuleSection1quadC1[0]), # Arc Edge
+            Edge(3, 0, self.capsuleSection1quad1[4]),  # Arc Edge
+            Edge(5, 6, self.ioSection1quad4[::-1]),    # Spline Edge
+            Edge(6, 7, self.ioSection1quadC1[0]),      # Spline Edge
+            Edge(7, 4, self.ioSection1quad1), # Spline Edge
         ]
 
         self.block2 = Block.create_from_points(self.block2Points, self.block2Edges)
@@ -662,11 +841,19 @@ class Hayabusa:
 
         """
         mesh = Mesh()
-        self.block1_3d()
+        # Computes the upper points of a mesh section
         self.section_points()
+        # Rotates the computed points in order to get 4 quadrants
+        self.central_points_rotation()
+        # Builds block1
+        self.build_block1()
+        # Builds block2
+        self.build_block2()
+        # Assembles the blocks
         mesh.add_block(self.block1)
         mesh.add_block(self.block2)
-        #self.test_circle()
-        sys.exit()
+
+        #sys.exit()
+
         mesh.write(output_path=os.path.join('case','system','blockMeshDict'))
         os.system('case/Allrun.mesh')

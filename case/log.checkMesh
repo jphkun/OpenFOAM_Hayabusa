@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 9-b456138dc4bc
 Exec   : checkMesh -constant
-Date   : Feb 16 2022
-Time   : 19:29:51
+Date   : Feb 18 2022
+Time   : 10:49:17
 Host   : "computer"
-PID    : 28510
+PID    : 67669
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -26,9 +26,9 @@ Create polyMesh for time = constant
 Time = constant
 
 Mesh stats
-    points:           2662
-    faces:            6600
-    internal faces:   5400
+    points:           2541
+    faces:            6500
+    internal faces:   5500
     cells:            2000
     faces per cell:   6
     boundary patches: 3
@@ -52,33 +52,29 @@ Checking topology...
     Point usage OK.
     Upper triangular ordering OK.
     Face vertices OK.
-   *Number of regions: 2
-    The mesh has multiple regions which are not connected by any face.
-  <<Writing region information to "constant/cellToRegion"
-  <<Writing region 0 with 1000 cells to cellSet region0
-  <<Writing region 1 with 1000 cells to cellSet region1
+    Number of regions: 1 (OK).
 
 Checking patch topology for multiply connected surfaces...
     Patch               Faces    Points   Surface topology                  
-    inlet               200      242      ok (non-closed singly connected)  
-    wall                200      242      ok (non-closed singly connected)  
-    defaultFaces        800      880      ok (non-closed singly connected)  
+    inlet               200      231      ok (non-closed singly connected)  
+    wall                200      231      ok (non-closed singly connected)  
+    defaultFaces        600      660      ok (non-closed singly connected)  
 
 Checking geometry...
-    Overall domain bounding box (-3.97131 -1.69706 -1.6108) (-0.04 1.69706 2.4)
+    Overall domain bounding box (-4.00748 -1.69706 -2.4) (-0.08 1.69706 1.13901)
     Mesh has 0 geometric (non-empty/wedge) directions (0 0 0)
     Mesh has 0 solution (non-empty) directions (0 0 0)
- ***Number of edges not aligned with or perpendicular to non-empty directions: 7250
-  <<Writing 2662 points on non-aligned edges to set nonAlignedEdges
-    Boundary openness (-1.36778e-16 -2.21534e-17 3.58436e-17) OK.
-    Max cell openness = 7.66471e-16 OK.
+ ***Number of edges not aligned with or perpendicular to non-empty directions: 7030
+  <<Writing 2541 points on non-aligned edges to set nonAlignedEdges
+    Boundary openness (-1.35774e-16 5.05112e-17 1.03447e-16) OK.
+    Max cell openness = 1.13519e-15 OK.
     Max aspect ratio = -1 OK.
-    Minimum face area = 9.93097e-05. Maximum face area = 0.138923.  Face area magnitudes OK.
-    Min volume = 0.000144164. Max volume = 0.0382904.  Total volume = 18.1915.  Cell volumes OK.
-    Mesh non-orthogonality Max: 12.2696 average: 1.88791
+    Minimum face area = 4.88481e-05. Maximum face area = 0.13847.  Face area magnitudes OK.
+    Min volume = 7.76169e-05. Max volume = 0.0189546.  Total volume = 12.0858.  Cell volumes OK.
+    Mesh non-orthogonality Max: 36.8583 average: 6.4468
     Non-orthogonality check OK.
     Face pyramids OK.
-    Max skewness = 0.727556 OK.
+    Max skewness = 1.69979 OK.
     Coupled point location match (average 0) OK.
 
 Failed 1 mesh checks.

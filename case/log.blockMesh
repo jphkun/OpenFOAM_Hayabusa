@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 9-b456138dc4bc
 Exec   : blockMesh
-Date   : Feb 16 2022
-Time   : 19:29:51
+Date   : Feb 18 2022
+Time   : 10:49:17
 Host   : "computer"
-PID    : 28509
+PID    : 67668
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -34,14 +34,14 @@ Creating block mesh topology
 --> FOAM Warning : 
     From function Foam::polyMesh::polyMesh(const Foam::IOobject&, Foam::pointField&&, const cellShapeList&, const faceListList&, const wordList&, const Foam::PtrList<Foam::dictionary>&, const Foam::word&, const Foam::word&, bool)
     in file meshes/polyMesh/polyMeshFromShapeMesh.C at line 873
-    Found 8 undefined faces in mesh; adding to default patch.
+    Found 6 undefined faces in mesh; adding to default patch.
 
 Check topology
 
 	Basic statistics
-		Number of internal faces : 0
-		Number of boundary faces : 12
-		Number of defined boundary faces : 12
+		Number of internal faces : 1
+		Number of boundary faces : 10
+		Number of defined boundary faces : 10
 		Number of undefined boundary faces : 0
 	Checking patch -> block consistency
 
@@ -53,29 +53,29 @@ Creating patches
 Creating cells
 Creating points with scale 1
     Block 0 cell size :
-        i : 0.00978522 .. 0.00978522 0.00989625 .. 0.00989625 0.0389284 .. 0.0389284 0.0399384 .. 0.0399384 
-        j : 0.0101061 .. 0.0101061 0.0101004 0.0419992 .. 0.0419992 0.0418764 .. 0.0418764 
-        k : 0.387195 .. 0.387195 0.387315 .. 0.387315 0.387312 .. 0.387312 0.3871 .. 0.3871 
+        i : 0.00710926 .. 0.00710926 0.00710926 .. 0.00710926 0.0293806 .. 0.0293806 0.0293806 .. 0.0293806 
+        j : 0.00710926 .. 0.00710926 0.00710926 .. 0.00710926 0.0293806 .. 0.0293806 0.0293806 .. 0.0293806 
+        k : 0.387584 .. 0.387584 0.387648 .. 0.387648 0.387648 .. 0.387648 0.387806 .. 0.387806 
     Block 1 cell size :
-        i : 0.0251069 .. 0.0251069 0.0236558 .. 0.0236558 0.0602566 .. 0.0602566 0.0577695 .. 0.0577695 
-        j : 0.0134897 .. 0.0134897 0.0136438 .. 0.0133125 0.0210784 .. 0.0212056 0.0212712 .. 0.0210124 
-        k : 0.38734 .. 0.38734 0.38734 .. 0.38734 0.387189 .. 0.387189 0.387174 .. 0.387174 
+        i : 0.00710926 .. 0.00710926 0.00798302 .. 0.00798302 0.0293806 .. 0.0293806 0.0308123 .. 0.0308123 
+        j : 0.00781592 .. 0.00781592 0.00825702 .. 0.00832506 0.0161029 .. 0.0161497 0.0181035 .. 0.0182556 
+        k : 0.387584 .. 0.387584 0.387648 .. 0.387648 0.387457 .. 0.387457 0.387162 .. 0.387162 
 
 Writing polyMesh
 ----------------
 Mesh Information
 ----------------
-  boundingBox: (-3.97131 -1.69706 -1.6108) (-0.04 1.69706 2.4)
-  nPoints: 2662
+  boundingBox: (-4.00748 -1.69706 -2.4) (-0.08 1.69706 1.13901)
+  nPoints: 2541
   nCells: 2000
-  nFaces: 6600
-  nInternalFaces: 5400
+  nFaces: 6500
+  nInternalFaces: 5500
 ----------------
 Patches
 ----------------
-  patch 0 (start: 5400 size: 200) name: inlet
-  patch 1 (start: 5600 size: 200) name: wall
-  patch 2 (start: 5800 size: 800) name: defaultFaces
+  patch 0 (start: 5500 size: 200) name: inlet
+  patch 1 (start: 5700 size: 200) name: wall
+  patch 2 (start: 5900 size: 600) name: defaultFaces
 
 End
 
