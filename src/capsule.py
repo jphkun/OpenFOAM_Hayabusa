@@ -73,9 +73,9 @@ class Hayabusa:
         self.c1 = 10 * self.capsuleDia
 
         # a2, b2, c2, are the "front" ellipsoid semi-axis
-        self.a2 =  4 * self.capsuleDia
+        self.a2 = 4  * self.capsuleDia
         self.b2 = 10 * self.capsuleDia
-        self.c2 = 10  * self.capsuleDia
+        self.c2 = 10 * self.capsuleDia
 
 
     # TODO: Wring type hinting output
@@ -145,11 +145,11 @@ class Hayabusa:
             print("Phi is not between 0 and pi")
             sys.exit()
 
-        if theta > np.pi/2 or theta > (3/2)*np.pi:
+        if theta < np.pi/2 or theta < (3/2)*np.pi: #theta > np.pi/2 or theta > (3/2)*np.pi:
             x = self.a1 * np.cos(theta) * np.sin(phi)
             y = self.b1 * np.sin(theta) * np.sin(phi)
             z = self.c1 * np.cos(phi)
-        elif theta > np.pi/2:
+        elif theta > np.pi/2 or theta > (3/2)*np.pi: #theta < np.pi/2 or theta < (3/2)*np.pi:
             x = self.a2 * np.cos(theta) * np.sin(phi)
             y = self.b2 * np.sin(theta) * np.sin(phi)
             z = self.c2 * np.cos(phi)
@@ -377,7 +377,7 @@ class Hayabusa:
             Color of the point. Some examples: 'r', 'g', 'b', 'k', 'c', 'm'
         """
         for pnt in pnts:
-            print(pnt)
+            #print(pnt)
             self.ax.scatter(pnt[0], pnt[1], pnt[2], color=c)
 
         # To make the graph kind of equal
@@ -441,7 +441,6 @@ class Hayabusa:
         """
         # TODO: Generalize the sphere origin
         sphereOg = [0.08, 0, 0]
-        print(2*'\n')
         # New code
         #######################################################################
         # WARNING all the following points are in the negative x direction
@@ -484,6 +483,13 @@ class Hayabusa:
         print(f'block2Phi1      [deg]: {np.rad2deg(block2PhiTop1):.4f}')
         print(f'block2Phi2      [deg]: {np.rad2deg(block2PhiTop2):.4f}')
 
+        # Outlet points top
+        # TODO: Block section 3 and not block 3
+        l = self.capsuleSphereCenter[0] / np.sqrt(2)
+        m = self.capsuleRad - l
+        blockS3PhiBot = np.arctan(self.capsuleSphereCenter[0] / m)
+        print(f'blockS3PhiBot: {np.rad2deg(blockS3PhiBot)}')
+
         # Computation of 10 angles "central point" between the edges01 and edges 45
         N = 10
         anglesCapsule0 = np.linspace(np.pi/2, block2BetaBot2, N)
@@ -491,9 +497,10 @@ class Hayabusa:
         print(f'anglesCapsule0  [deg]:\n {np.rad2deg(anglesCapsule0)}')
         print(f'anglesCapsule1  [deg]:\n {np.rad2deg(anglesCapsule1)}')
 
-        anglesInlet0 = np.linspace(block2PhiBot2, np.pi/2, N)
-        anglesInlet1 = np.linspace(block2PhiTop2, block2PhiBot2, N)
-        anglesInlet2 = np.linspace(0, block2PhiTop2, N)
+        anglesInlet0  = np.linspace(block2PhiBot2,       np.pi/2, N)
+        anglesInlet1  = np.linspace(block2PhiTop2, block2PhiBot2, N)
+        anglesInlet2  = np.linspace(            0, block2PhiTop2, N)
+        anglesOutlet3 = np.linspace(blockS3PhiBot,             0, N)
         print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet0)}')
         print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet1)}')
         print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet2)}')
@@ -506,15 +513,16 @@ class Hayabusa:
         # Section 1
         self.ccPnts1 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule1]
         # Section 2
-        xFront = np.linspace(self.ccPnts1[0][0], 0, N)
+        xFront = np.linspace(0, self.ccPnts1[0][0], N)
         self.ccPnts2 = [self.point_on_straight_front(x) for x in xFront]
 
         # Back of the capsule
         # Section 3
         xBack  = np.linspace(0, sphereOg[0], N)
         self.ccPnts3 = [self.point_on_straight_back(x) for x in xBack]
-        # TODO:
+        # Section 4 
         self.ccPnts4 = []
+        # Section 5
         self.ccPnts5 = []
 
         """
@@ -541,7 +549,8 @@ class Hayabusa:
         # Back of the capsule
         # TODO: compute the final phi angle for section 3
         # Section 3
-        self.iocPnts3 = []
+        print(f'anglesOutlet3: {np.rad2deg(anglesOutlet3)}')
+        self.iocPnts3 = [self.point_on_ellipsoid(0, ang) for ang in anglesOutlet3]
         self.iocPnts4 = []
         self.iocPnts5 = []
 
@@ -607,24 +616,24 @@ class Hayabusa:
         eX = [0, 0, 1]
 
         # Rotation vector for quaternions
-        quaternionRotation1 = self.rotation_vector(eX, quadrant1Angle)
-        quaternionRotationC1= self.rotation_vector(eX, quadrant1cAngle)
-        quaternionRotation2 = self.rotation_vector(eX, quadrant2Angle)
-        quaternionRotationC2= self.rotation_vector(eX, quadrant2cAngle)
-        quaternionRotation3 = self.rotation_vector(eX, quadrant3Angle)
-        quaternionRotationC3= self.rotation_vector(eX, quadrant3cAngle)
-        quaternionRotation4 = self.rotation_vector(eX, quadrant4Angle)
-        quaternionRotationC4= self.rotation_vector(eX, quadrant4cAngle)
+        quaternionRotation1  = self.rotation_vector(eX, quadrant1Angle)
+        quaternionRotationC1 = self.rotation_vector(eX, quadrant1cAngle)
+        quaternionRotation2  = self.rotation_vector(eX, quadrant2Angle)
+        quaternionRotationC2 = self.rotation_vector(eX, quadrant2cAngle)
+        quaternionRotation3  = self.rotation_vector(eX, quadrant3Angle)
+        quaternionRotationC3 = self.rotation_vector(eX, quadrant3cAngle)
+        quaternionRotation4  = self.rotation_vector(eX, quadrant4Angle)
+        quaternionRotationC4 = self.rotation_vector(eX, quadrant4cAngle)
 
         # Quaternion self.rotation functions defined
-        self.rotQuat1 = R.from_quat(quaternionRotation1)
-        self.rotQuatC1= R.from_quat(quaternionRotationC1)
-        self.rotQuat2 = R.from_quat(quaternionRotation2)
-        self.rotQuatC2= R.from_quat(quaternionRotationC2)
-        self.rotQuat3 = R.from_quat(quaternionRotation3)
-        self.rotQuatC3= R.from_quat(quaternionRotationC3)
-        self.rotQuat4 = R.from_quat(quaternionRotation4)
-        self.rotQuatC4= R.from_quat(quaternionRotationC4)
+        self.rotQuat1  = R.from_quat(quaternionRotation1)
+        self.rotQuatC1 = R.from_quat(quaternionRotationC1)
+        self.rotQuat2  = R.from_quat(quaternionRotation2)
+        self.rotQuatC2 = R.from_quat(quaternionRotationC2)
+        self.rotQuat3  = R.from_quat(quaternionRotation3)
+        self.rotQuatC3 = R.from_quat(quaternionRotationC3)
+        self.rotQuat4  = R.from_quat(quaternionRotation4)
+        self.rotQuatC4 = R.from_quat(quaternionRotationC4)
 
         # Saves the self.rotated capsule construction points
         # Section 0
@@ -633,24 +642,34 @@ class Hayabusa:
         self.capsuleSection0quad3 = self.rotQuat3.apply(self.ccPnts0)
         self.capsuleSection0quad4 = self.rotQuat4.apply(self.ccPnts0)
         # Section 1
-        self.capsuleSection1quad1 = self.rotQuat1.apply(self.ccPnts1)
-        self.capsuleSection1quadC1= self.rotQuatC1.apply(self.ccPnts1)
-        self.capsuleSection1quad2 = self.rotQuat2.apply(self.ccPnts1)
-        self.capsuleSection1quadC2= self.rotQuatC2.apply(self.ccPnts1)
-        self.capsuleSection1quad3 = self.rotQuat3.apply(self.ccPnts1)
-        self.capsuleSection1quadC3= self.rotQuatC3.apply(self.ccPnts3)
-        self.capsuleSection1quad4 = self.rotQuat4.apply(self.ccPnts1)
-        self.capsuleSection1quadC4= self.rotQuatC4.apply(self.ccPnts1)
+        self.capsuleSection1quad1  = self.rotQuat1.apply(self.ccPnts1)
+        self.capsuleSection1quadC1 = self.rotQuatC1.apply(self.ccPnts1)
+        self.capsuleSection1quad2  = self.rotQuat2.apply(self.ccPnts1)
+        self.capsuleSection1quadC2 = self.rotQuatC2.apply(self.ccPnts1)
+        self.capsuleSection1quad3  = self.rotQuat3.apply(self.ccPnts1)
+        self.capsuleSection1quadC3 = self.rotQuatC3.apply(self.ccPnts1)
+        self.capsuleSection1quad4  = self.rotQuat4.apply(self.ccPnts1)
+        self.capsuleSection1quadC4 = self.rotQuatC4.apply(self.ccPnts1)
         # Section 2
-        self.capsuleSection2quad1 = self.rotQuat1.apply(self.ccPnts2)
-        self.capsuleSection2quad2 = self.rotQuat2.apply(self.ccPnts2)
-        self.capsuleSection2quad3 = self.rotQuat3.apply(self.ccPnts2)
-        self.capsuleSection2quad4 = self.rotQuat4.apply(self.ccPnts2)
+        self.capsuleSection2quad1  = self.rotQuat1.apply(self.ccPnts2)
+        self.capsuleSection2quadC1 = self.rotQuatC1.apply(self.ccPnts2)
+        self.capsuleSection2quad2  = self.rotQuat2.apply(self.ccPnts2)
+        self.capsuleSection2quadC2 = self.rotQuatC2.apply(self.ccPnts2)
+        self.capsuleSection2quad3  = self.rotQuat3.apply(self.ccPnts2)
+        self.capsuleSection2quadC3 = self.rotQuatC3.apply(self.ccPnts2)
+        self.capsuleSection2quad4  = self.rotQuat4.apply(self.ccPnts2)
+        self.capsuleSection2quadC4 = self.rotQuatC4.apply(self.ccPnts2)
+
         # Section 3
-        self.capsuleSection3quad1 = self.rotQuat1.apply(self.ccPnts3)
-        self.capsuleSection3quad2 = self.rotQuat2.apply(self.ccPnts3)
-        self.capsuleSection3quad3 = self.rotQuat3.apply(self.ccPnts3)
-        self.capsuleSection3quad4 = self.rotQuat4.apply(self.ccPnts3)
+        self.capsuleSection3quad1  = self.rotQuat1.apply(self.ccPnts3)
+        self.capsuleSection3quadC1 = self.rotQuatC1.apply(self.ccPnts3)
+        self.capsuleSection3quad2  = self.rotQuat2.apply(self.ccPnts3)
+        self.capsuleSection3quadC2 = self.rotQuatC2.apply(self.ccPnts3)
+        self.capsuleSection3quad3  = self.rotQuat3.apply(self.ccPnts3)
+        self.capsuleSection3quadC3 = self.rotQuatC3.apply(self.ccPnts3)
+        self.capsuleSection3quad4  = self.rotQuat4.apply(self.ccPnts3)
+        self.capsuleSection3quadC4 = self.rotQuatC4.apply(self.ccPnts3)
+
         # Section 4
         # Section 5
 
@@ -673,20 +692,29 @@ class Hayabusa:
 
         # Section 2
         self.ioSection2quad1 = self.rotQuat1.apply(self.iocPnts2)
+        self.ioSection2quadC1= self.rotQuatC1.apply(self.iocPnts2)
         self.ioSection2quad2 = self.rotQuat2.apply(self.iocPnts2)
+        self.ioSection2quadC2= self.rotQuatC2.apply(self.iocPnts2)
         self.ioSection2quad3 = self.rotQuat3.apply(self.iocPnts2)
+        self.ioSection2quadC3= self.rotQuatC3.apply(self.iocPnts2)
         self.ioSection2quad4 = self.rotQuat4.apply(self.iocPnts2)
+        self.ioSection2quadC4= self.rotQuatC4.apply(self.iocPnts2)
+
         # Section 3
+        self.ioSection3quad1 = self.rotQuat1.apply(self.iocPnts3)
+        self.ioSection3quadC1= self.rotQuatC1.apply(self.iocPnts3)
+        self.ioSection3quad2 = self.rotQuat2.apply(self.iocPnts3)
+        self.ioSection3quadC2= self.rotQuatC2.apply(self.iocPnts3)
+        self.ioSection3quad3 = self.rotQuat3.apply(self.iocPnts3)
+        self.ioSection3quadC3= self.rotQuatC3.apply(self.iocPnts3)
+        self.ioSection3quad4 = self.rotQuat4.apply(self.iocPnts3)
+        self.ioSection3quadC4= self.rotQuatC4.apply(self.iocPnts3)
+
         # Section 4
         # Section 5
 
-    def compute_angles(self, p1, e):
-        """
-        Returns
-        -------
-        angle: float
-            angle between the point and the vector e
-        """
+
+    # TODO: Correct all the spline edges that are an arc edge
 
     def build_block1(self):
         """
@@ -795,12 +823,11 @@ class Hayabusa:
         self.block1.chop(0, count=10, c2c_expansion=1)
         self.block1.chop(1, count=10, c2c_expansion=1)
         self.block1.chop(2, count=10, c2c_expansion=1)
-        self.show_plot()
 
 
     def build_block2(self):
         """
-
+        Computes block 2 vertices and points
         """
         # Computes vertices for block 2
         blk2v0 = self.capsuleSection1quad1[-1]
@@ -823,7 +850,7 @@ class Hayabusa:
             Edge(3, 0, self.capsuleSection1quad1[4]),  # Arc Edge
             Edge(5, 6, self.ioSection1quad4[::-1]),    # Spline Edge
             Edge(6, 7, self.ioSection1quadC1[0]),      # Spline Edge
-            Edge(7, 4, self.ioSection1quad1), # Spline Edge
+            Edge(7, 4, self.ioSection1quad1),          # Spline Edge
         ]
 
         self.block2 = Block.create_from_points(self.block2Points, self.block2Edges)
@@ -833,7 +860,389 @@ class Hayabusa:
         self.block2.chop(0, count=10, c2c_expansion=1)
         self.block2.chop(1, count=10, c2c_expansion=1)
         self.block2.chop(2, count=10, c2c_expansion=1)
-        self.show_plot()
+
+
+    def build_block3(self):
+        """
+        Computes block 3 vertices and points
+        """
+        # Computes vertices for block 2
+        blk3v0 = self.capsuleSection1quad2[-1]
+        blk3v1 = self.capsuleSection1quad1[-1]
+        blk3v2 = self.capsuleSection1quad1[0]
+        blk3v3 = self.capsuleSection1quad2[0]
+        blk3v4 = self.ioSection1quad2[-1]
+        blk3v5 = self.ioSection1quad1[-1]
+        blk3v6 = self.ioSection1quad1[0]
+        blk3v7 = self.ioSection1quad2[0]
+
+        self.block3Points = [
+            blk3v0, blk3v1, blk3v2, blk3v3,
+            blk3v4, blk3v5, blk3v6, blk3v7,
+        ]
+
+        self.block3Edges = [
+            # The missing edges are defined in block 1 and 2 
+            Edge(2, 3, self.capsuleSection1quadC2[0]), # Arc Edge
+            Edge(3, 0, self.capsuleSection1quad2[4]),  # Arc Edge
+            Edge(6, 7, self.ioSection1quadC2[0]),      # Spline Edge
+            Edge(7, 4, self.ioSection1quad2),          # Spline Edge
+        ]
+
+        self.block3 = Block.create_from_points(self.block3Points, self.block3Edges)
+        self.block3.set_patch('top','inlet')
+        self.block3.set_patch('bottom','wall')
+
+        self.block3.chop(0, count=10, c2c_expansion=1)
+        self.block3.chop(1, count=10, c2c_expansion=1)
+        self.block3.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block4(self):
+        """
+        Computes block 4 vertices and points
+        """
+        # Computes vertices for block 2
+        blk4v0 = self.capsuleSection1quad3[-1]
+        blk4v1 = self.capsuleSection1quad2[-1]
+        blk4v2 = self.capsuleSection1quad2[0]
+        blk4v3 = self.capsuleSection1quad3[0]
+        blk4v4 = self.ioSection1quad3[-1]
+        blk4v5 = self.ioSection1quad2[-1]
+        blk4v6 = self.ioSection1quad2[0]
+        blk4v7 = self.ioSection1quad3[0]
+
+        self.block4Points = [
+            blk4v0, blk4v1, blk4v2, blk4v3,
+            blk4v4, blk4v5, blk4v6, blk4v7,
+        ]
+
+        self.block4Edges = [
+            # The missing edges are defined in block 1, 2, 3 
+            Edge(2, 3, self.capsuleSection1quadC3[0]), # Arc Edge
+            Edge(3, 0, self.capsuleSection1quad3[4]),  # Arc Edge
+            Edge(6, 7, self.ioSection1quadC3[0]),      # Spline Edge
+            Edge(7, 4, self.ioSection1quad3),          # Spline Edge
+        ]
+
+        self.block4 = Block.create_from_points(self.block4Points, self.block4Edges)
+        self.block4.set_patch('top','inlet')
+        self.block4.set_patch('bottom','wall')
+
+        self.block4.chop(0, count=10, c2c_expansion=1)
+        self.block4.chop(1, count=10, c2c_expansion=1)
+        self.block4.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block5(self):
+        """
+        Computes block 5 vertices and points
+        """
+        # Computes vertices for block 2
+        blk5v0 = self.capsuleSection1quad4[-1]
+        blk5v1 = self.capsuleSection1quad3[-1]
+        blk5v2 = self.capsuleSection1quad3[0]
+        blk5v3 = self.capsuleSection1quad4[0]
+        blk5v4 = self.ioSection1quad4[-1]
+        blk5v5 = self.ioSection1quad3[-1]
+        blk5v6 = self.ioSection1quad3[0]
+        blk5v7 = self.ioSection1quad4[0]
+
+        self.block5Points = [
+            blk5v0, blk5v1, blk5v2, blk5v3,
+            blk5v4, blk5v5, blk5v6, blk5v7,
+        ]
+
+        self.block5Edges = [
+            # The missing edges are defined in block 1, 2, 3 
+            Edge(2, 3, self.capsuleSection1quadC4[0]), # Arc Edge
+            Edge(6, 7, self.ioSection1quadC4[0]),      # Spline Edge
+        ]
+
+        self.block5 = Block.create_from_points(self.block5Points, self.block5Edges)
+        self.block5.set_patch('top','inlet')
+        self.block5.set_patch('bottom','wall')
+
+        self.block5.chop(0, count=10, c2c_expansion=1)
+        self.block5.chop(1, count=10, c2c_expansion=1)
+        self.block5.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block6(self):
+        """
+        Computes block 6 vertices and points
+        """
+        # Computes vertices for block 2
+        blk6v0 = self.capsuleSection2quad1[-1]
+        blk6v1 = self.capsuleSection2quad4[-1]
+        blk6v2 = self.capsuleSection2quad4[0]
+        blk6v3 = self.capsuleSection2quad1[0]
+        blk6v4 = self.ioSection2quad1[-1]
+        blk6v5 = self.ioSection2quad4[-1]
+        blk6v6 = self.ioSection2quad4[0]
+        blk6v7 = self.ioSection2quad1[0]
+
+        self.block6Points = [
+            blk6v0, blk6v1, blk6v2, blk6v3,
+            blk6v4, blk6v5, blk6v6, blk6v7,
+        ]
+
+        self.block6Edges = [
+            Edge(2, 3, self.capsuleSection2quadC1[0]), # Arc Edge
+            Edge(5, 6, self.ioSection2quad4[::-1]),    # Spline Edge
+            Edge(6, 7, self.ioSection2quadC1[0]),      # Spline Edge
+            Edge(7, 4, self.ioSection2quad1),          # Spline Edge
+        ]
+
+        self.block6 = Block.create_from_points(self.block6Points, self.block6Edges)
+        self.block6.set_patch('top','inlet')
+        self.block6.set_patch('bottom','wall')
+
+        self.block6.chop(0, count=10, c2c_expansion=1)
+        self.block6.chop(1, count=10, c2c_expansion=1)
+        self.block6.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block7(self):
+        """
+        Computes block 7 vertices and points
+        """
+        # Computes vertices for block 2
+        blk7v0 = self.capsuleSection2quad2[-1]
+        blk7v1 = self.capsuleSection2quad1[-1]
+        blk7v2 = self.capsuleSection2quad1[0]
+        blk7v3 = self.capsuleSection2quad2[0]
+        blk7v4 = self.ioSection2quad2[-1]
+        blk7v5 = self.ioSection2quad1[-1]
+        blk7v6 = self.ioSection2quad1[0]
+        blk7v7 = self.ioSection2quad2[0]
+
+        self.block7Points = [
+            blk7v0, blk7v1, blk7v2, blk7v3,
+            blk7v4, blk7v5, blk7v6, blk7v7,
+        ]
+
+        self.block7Edges = [
+            Edge(2, 3, self.capsuleSection2quadC2[0]), # Arc Edge
+            Edge(6, 7, self.ioSection2quadC2[0]),      # Spline Edge
+            Edge(7, 4, self.ioSection2quad2),          # Spline Edge
+        ]
+
+        self.block7 = Block.create_from_points(self.block7Points, self.block7Edges)
+        self.block7.set_patch('top','inlet')
+        self.block7.set_patch('bottom','wall')
+
+        self.block7.chop(0, count=10, c2c_expansion=1)
+        self.block7.chop(1, count=10, c2c_expansion=1)
+        self.block7.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block8(self):
+        """
+        Computes block 8 vertices and points
+        """
+        # Computes vertices for block 2
+        blk8v0 = self.capsuleSection2quad3[-1]
+        blk8v1 = self.capsuleSection2quad2[-1]
+        blk8v2 = self.capsuleSection2quad2[0]
+        blk8v3 = self.capsuleSection2quad3[0]
+        blk8v4 = self.ioSection2quad3[-1]
+        blk8v5 = self.ioSection2quad2[-1]
+        blk8v6 = self.ioSection2quad2[0]
+        blk8v7 = self.ioSection2quad3[0]
+
+        self.block8Points = [
+            blk8v0, blk8v1, blk8v2, blk8v3,
+            blk8v4, blk8v5, blk8v6, blk8v7,
+        ]
+
+        self.block8Edges = [
+            Edge(2, 3, self.capsuleSection2quadC3[0]), # Arc Edge
+            Edge(6, 7, self.ioSection2quadC3[0]),      # Spline Edge
+            Edge(7, 4, self.ioSection2quad3),          # Spline Edge
+        ]
+
+        self.block8 = Block.create_from_points(self.block8Points, self.block8Edges)
+        self.block8.set_patch('top','inlet')
+        self.block8.set_patch('bottom','wall')
+
+        self.block8.chop(0, count=10, c2c_expansion=1)
+        self.block8.chop(1, count=10, c2c_expansion=1)
+        self.block8.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block9(self):
+        """
+        Computes block 9 vertices and points
+        """
+        # Computes vertices for block 2
+        blk9v0 = self.capsuleSection2quad4[-1]
+        blk9v1 = self.capsuleSection2quad3[-1]
+        blk9v2 = self.capsuleSection2quad3[0]
+        blk9v3 = self.capsuleSection2quad4[0]
+        blk9v4 = self.ioSection2quad4[-1]
+        blk9v5 = self.ioSection2quad3[-1]
+        blk9v6 = self.ioSection2quad3[0]
+        blk9v7 = self.ioSection2quad4[0]
+
+        self.block9Points = [
+            blk9v0, blk9v1, blk9v2, blk9v3,
+            blk9v4, blk9v5, blk9v6, blk9v7,
+        ]
+
+        self.block9Edges = [
+            Edge(2, 3, self.capsuleSection2quadC4[0]), # Arc Edge
+            Edge(6, 7, self.ioSection2quadC4[0]),      # Arc Edge 
+        ]
+
+        self.block9 = Block.create_from_points(self.block9Points, self.block9Edges)
+        self.block9.set_patch('top','inlet')
+        self.block9.set_patch('bottom','wall')
+
+        self.block9.chop(0, count=10, c2c_expansion=1)
+        self.block9.chop(1, count=10, c2c_expansion=1)
+        self.block9.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block10(self):
+        """
+        Computes block 10 vertices and points
+        """
+        # Computes vertices for block 10
+        blk10v0 = self.capsuleSection3quad1[0]
+        blk10v1 = self.capsuleSection3quad4[0]
+        blk10v2 = self.capsuleSection3quad4[-1]
+        blk10v3 = self.capsuleSection3quad1[-1]
+        blk10v4 = self.ioSection3quad1[-1]
+        blk10v5 = self.ioSection3quad4[-1]
+        blk10v6 = self.ioSection3quad4[0]
+        blk10v7 = self.ioSection3quad1[0]
+
+        self.block10Points = [
+            blk10v0, blk10v1, blk10v2, blk10v3,
+            blk10v4, blk10v5, blk10v6, blk10v7,
+        ]
+
+        self.block10Edges = [
+            Edge(2, 3, self.capsuleSection3quadC1[-1]), # Arc Edge
+            Edge(5, 6, self.ioSection3quad4[::-1]),     # Spline Edge
+            Edge(6, 7, self.ioSection3quadC1[0]),       # Spline Edge
+            Edge(7, 4, self.ioSection3quad1),           # Spline Edge
+        ]
+
+        self.block10 = Block.create_from_points(self.block10Points, self.block10Edges)
+        #self.block10.set_patch('top','outlet')
+        #self.block10.set_patch('bottom','wall')
+
+        self.block10.chop(0, count=10, c2c_expansion=1)
+        self.block10.chop(1, count=10, c2c_expansion=1)
+        self.block10.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block11(self):
+        """
+        Computes block 11 vertices and points
+        """
+        # Computes vertices for block 11
+        blk11v0 = self.capsuleSection3quad2[0]
+        blk11v1 = self.capsuleSection3quad1[0]
+        blk11v2 = self.capsuleSection3quad1[-1]
+        blk11v3 = self.capsuleSection3quad2[-1]
+        blk11v4 = self.ioSection3quad2[-1]
+        blk11v5 = self.ioSection3quad1[-1]
+        blk11v6 = self.ioSection3quad1[0]
+        blk11v7 = self.ioSection3quad2[0]
+
+        self.block11Points = [
+            blk11v0, blk11v1, blk11v2, blk11v3,
+            blk11v4, blk11v5, blk11v6, blk11v7,
+        ]
+
+        self.block11Edges = [
+            Edge(2, 3, self.capsuleSection3quadC2[-1]), # Arc Edge
+            Edge(6, 7, self.ioSection3quadC2[0]),       # Spline Edge
+            Edge(7, 4, self.ioSection3quad2),           # Spline Edge
+        ]
+
+        self.block11 = Block.create_from_points(self.block11Points, self.block11Edges)
+        #self.block11.set_patch('top','outlet')
+        #self.block11.set_patch('bottom','wall')
+
+        self.block11.chop(0, count=10, c2c_expansion=1)
+        self.block11.chop(1, count=10, c2c_expansion=1)
+        self.block11.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block12(self):
+        """
+        Computes block 12 vertices and points
+        """
+        # Computes vertices for block 12
+        blk12v0 = self.capsuleSection3quad3[0]
+        blk12v1 = self.capsuleSection3quad2[0]
+        blk12v2 = self.capsuleSection3quad2[-1]
+        blk12v3 = self.capsuleSection3quad3[-1]
+        blk12v4 = self.ioSection3quad3[-1]
+        blk12v5 = self.ioSection3quad2[-1]
+        blk12v6 = self.ioSection3quad2[0]
+        blk12v7 = self.ioSection3quad3[0]
+
+        self.block12Points = [
+            blk12v0, blk12v1, blk12v2, blk12v3,
+            blk12v4, blk12v5, blk12v6, blk12v7,
+        ]
+
+        self.block12Edges = [
+            Edge(2, 3, self.capsuleSection3quadC3[-1]), # Arc Edge
+            Edge(6, 7, self.ioSection3quadC3[0]),       # Spline Edge
+            Edge(7, 4, self.ioSection3quad3),           # Spline Edge
+        ]
+
+        self.block12 = Block.create_from_points(self.block12Points, self.block12Edges)
+        #self.block12.set_patch('top','outlet')
+        #self.block12.set_patch('bottom','wall')
+
+        self.block12.chop(0, count=10, c2c_expansion=1)
+        self.block12.chop(1, count=10, c2c_expansion=1)
+        self.block12.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block13(self):
+        """
+        Computes block 13 vertices and points
+        """
+        # Computes vertices for block 13
+        blk13v0 = self.capsuleSection3quad3[0]
+        blk13v1 = self.capsuleSection3quad2[0]
+        blk13v2 = self.capsuleSection3quad2[-1]
+        blk13v3 = self.capsuleSection3quad3[-1]
+        blk13v4 = self.ioSection3quad3[-1]
+        blk13v5 = self.ioSection3quad2[-1]
+        blk13v6 = self.ioSection3quad2[0]
+        blk13v7 = self.ioSection3quad3[0]
+
+        self.block13Points = [
+            blk13v0, blk13v1, blk13v2, blk13v3,
+            blk13v4, blk13v5, blk13v6, blk13v7,
+        ]
+        for pnt in self.block12Points:
+            print(pnt)
+        print(' ')
+        print(self.capsuleSection3quadC1[-1])
+        self.block13Edges = [
+            Edge(2, 3, self.capsuleSection3quadC3[-1]), # Arc Edge
+            Edge(6, 7, self.ioSection3quadC3[0]),       # Spline Edge
+            Edge(7, 4, self.ioSection3quad3),           # Spline Edge
+        ]
+        #sys.exit()
+        self.block13 = Block.create_from_points(self.block13Points, self.block13Edges)
+        #self.block13.set_patch('top','outlet')
+        #self.block13.set_patch('bottom','wall')
+
+        self.block13.chop(0, count=10, c2c_expansion=1)
+        self.block13.chop(1, count=10, c2c_expansion=1)
+        self.block13.chop(2, count=10, c2c_expansion=1)
+
 
     # TODO: Put this part into the main for code clarity
     def mesh_3D(self):
@@ -845,15 +1254,35 @@ class Hayabusa:
         self.section_points()
         # Rotates the computed points in order to get 4 quadrants
         self.central_points_rotation()
-        # Builds block1
+        # Compute vertices and points for each blocks
         self.build_block1()
-        # Builds block2
         self.build_block2()
+        self.build_block3()
+        self.build_block4()
+        self.build_block5()
+        self.build_block6()
+        self.build_block7()
+        self.build_block8()
+        self.build_block9()
+        self.build_block10()
+        self.build_block11()
+        self.build_block12()
+        self.build_block13()
+
         # Assembles the blocks
         mesh.add_block(self.block1)
         mesh.add_block(self.block2)
-
-        #sys.exit()
+        mesh.add_block(self.block3)
+        mesh.add_block(self.block4)
+        mesh.add_block(self.block5)
+        mesh.add_block(self.block6)
+        mesh.add_block(self.block7)
+        mesh.add_block(self.block8)
+        mesh.add_block(self.block9)
+        #mesh.add_block(self.block10)
+        #mesh.add_block(self.block11)
+        #mesh.add_block(self.block12)
+        #mesh.add_block(self.block13)
 
         mesh.write(output_path=os.path.join('case','system','blockMeshDict'))
         os.system('case/Allrun.mesh')

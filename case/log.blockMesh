@@ -8,9 +8,9 @@
 Build  : 9-b456138dc4bc
 Exec   : blockMesh
 Date   : Feb 18 2022
-Time   : 10:49:17
+Time   : 17:03:29
 Host   : "computer"
-PID    : 67668
+PID    : 89689
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -34,14 +34,14 @@ Creating block mesh topology
 --> FOAM Warning : 
     From function Foam::polyMesh::polyMesh(const Foam::IOobject&, Foam::pointField&&, const cellShapeList&, const faceListList&, const wordList&, const Foam::PtrList<Foam::dictionary>&, const Foam::word&, const Foam::word&, bool)
     in file meshes/polyMesh/polyMeshFromShapeMesh.C at line 873
-    Found 6 undefined faces in mesh; adding to default patch.
+    Found 4 undefined faces in mesh; adding to default patch.
 
 Check topology
 
 	Basic statistics
-		Number of internal faces : 1
-		Number of boundary faces : 10
-		Number of defined boundary faces : 10
+		Number of internal faces : 16
+		Number of boundary faces : 22
+		Number of defined boundary faces : 22
 		Number of undefined boundary faces : 0
 	Checking patch -> block consistency
 
@@ -60,22 +60,50 @@ Creating points with scale 1
         i : 0.00710926 .. 0.00710926 0.00798302 .. 0.00798302 0.0293806 .. 0.0293806 0.0308123 .. 0.0308123 
         j : 0.00781592 .. 0.00781592 0.00825702 .. 0.00832506 0.0161029 .. 0.0161497 0.0181035 .. 0.0182556 
         k : 0.387584 .. 0.387584 0.387648 .. 0.387648 0.387457 .. 0.387457 0.387162 .. 0.387162 
+    Block 2 cell size :
+        i : 0.00710926 .. 0.00710926 0.00798302 0.0293806 .. 0.0293806 0.0308123 .. 0.0308123 
+        j : 0.00781592 .. 0.00781592 0.00825702 .. 0.00832506 0.0161029 .. 0.0161497 0.0181035 .. 0.0182556 
+        k : 0.387584 .. 0.387584 0.387648 .. 0.387648 0.387457 .. 0.387457 0.387162 .. 0.387162 
+    Block 3 cell size :
+        i : 0.00710926 .. 0.00710926 0.00798302 0.0293806 .. 0.0293806 0.0308123 .. 0.0308123 
+        j : 0.00781592 .. 0.00781592 0.00825702 .. 0.00832506 0.0161029 .. 0.0161497 0.0181035 .. 0.0182556 
+        k : 0.387584 .. 0.387584 0.387648 .. 0.387648 0.387457 .. 0.387457 0.387162 .. 0.387162 
+    Block 4 cell size :
+        i : 0.00710926 .. 0.00710926 0.00798302 .. 0.00798302 0.0293806 .. 0.0293806 0.0308123 .. 0.0308123 
+        j : 0.00781592 .. 0.00781592 0.00825702 .. 0.00832506 0.0161029 .. 0.0161497 0.0181035 .. 0.0182556 
+        k : 0.387584 .. 0.387584 0.387648 .. 0.387648 0.387457 .. 0.387457 0.387162 .. 0.387162 
+    Block 5 cell size :
+        i : 0.0188302 .. 0.0188302 0.0200855 .. 0.0200855 0.0546075 .. 0.0546075 0.0595978 
+        j : 0.0113137 .. 0.0113137 0.0113137 .. 0.0113137 0.0470456 .. 0.0449544 0.0461547 .. 0.0452486 
+        k : 0.38643 0.38643 .. 0.38643 0.386073 .. 0.386073 0.385288 .. 0.385288 
+    Block 6 cell size :
+        i : 0.0188302 .. 0.0188302 0.0200855 .. 0.0200855 0.0546075 .. 0.0546075 0.0595978 .. 0.0595978 
+        j : 0.0113137 .. 0.0113137 0.0113137 .. 0.0113137 0.0470456 .. 0.0449544 0.0461547 .. 0.0452486 
+        k : 0.38643 0.38643 .. 0.38643 0.386073 .. 0.386073 0.385288 .. 0.385288 
+    Block 7 cell size :
+        i : 0.0188302 .. 0.0188302 0.0200855 .. 0.0200855 0.0546075 .. 0.0546075 0.0595978 .. 0.0595978 
+        j : 0.0113137 .. 0.0113137 0.0113137 .. 0.0113137 0.0470456 .. 0.0449544 0.0461547 .. 0.0452486 
+        k : 0.38643 0.38643 .. 0.38643 0.386073 .. 0.386073 0.385288 .. 0.385288 
+    Block 8 cell size :
+        i : 0.0188302 .. 0.0188302 0.0200855 .. 0.0200855 0.0546075 .. 0.0546075 0.0595978 .. 0.0595978 
+        j : 0.0113137 .. 0.0113137 0.0113137 .. 0.0113137 0.0470456 .. 0.0449544 0.0461547 .. 0.0452486 
+        k : 0.38643 0.38643 .. 0.38643 0.386073 .. 0.386073 0.385288 .. 0.385288 
 
 Writing polyMesh
 ----------------
 Mesh Information
 ----------------
-  boundingBox: (-4.00748 -1.69706 -2.4) (-0.08 1.69706 1.13901)
-  nPoints: 2541
-  nCells: 2000
-  nFaces: 6500
-  nInternalFaces: 5500
+  boundingBox: (-4.00748 -4 -4) (0 4 4)
+  nPoints: 10131
+  nCells: 9000
+  nFaces: 28100
+  nInternalFaces: 25900
 ----------------
 Patches
 ----------------
-  patch 0 (start: 5500 size: 200) name: inlet
-  patch 1 (start: 5700 size: 200) name: wall
-  patch 2 (start: 5900 size: 600) name: defaultFaces
+  patch 0 (start: 25900 size: 900) name: wall
+  patch 1 (start: 26800 size: 900) name: inlet
+  patch 2 (start: 27700 size: 400) name: defaultFaces
 
 End
 

@@ -8,9 +8,9 @@
 Build  : 9-b456138dc4bc
 Exec   : setsToZones -noFlipMap -constant
 Date   : Feb 18 2022
-Time   : 10:49:17
+Time   : 17:03:29
 Host   : "computer"
-PID    : 67670
+PID    : 89691
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1

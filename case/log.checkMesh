@@ -8,9 +8,9 @@
 Build  : 9-b456138dc4bc
 Exec   : checkMesh -constant
 Date   : Feb 18 2022
-Time   : 10:49:17
+Time   : 17:03:29
 Host   : "computer"
-PID    : 67669
+PID    : 89690
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -26,10 +26,10 @@ Create polyMesh for time = constant
 Time = constant
 
 Mesh stats
-    points:           2541
-    faces:            6500
-    internal faces:   5500
-    cells:            2000
+    points:           10131
+    faces:            28100
+    internal faces:   25900
+    cells:            9000
     faces per cell:   6
     boundary patches: 3
     point zones:      0
@@ -37,7 +37,7 @@ Mesh stats
     cell zones:       0
 
 Overall number of cells of each type:
-    hexahedra:     2000
+    hexahedra:     9000
     prisms:        0
     wedges:        0
     pyramids:      0
@@ -56,25 +56,25 @@ Checking topology...
 
 Checking patch topology for multiply connected surfaces...
     Patch               Faces    Points   Surface topology                  
-    inlet               200      231      ok (non-closed singly connected)  
-    wall                200      231      ok (non-closed singly connected)  
-    defaultFaces        600      660      ok (non-closed singly connected)  
+    wall                900      921      ok (non-closed singly connected)  
+    inlet               900      921      ok (non-closed singly connected)  
+    defaultFaces        400      440      ok (non-closed singly connected)  
 
 Checking geometry...
-    Overall domain bounding box (-4.00748 -1.69706 -2.4) (-0.08 1.69706 1.13901)
-    Mesh has 0 geometric (non-empty/wedge) directions (0 0 0)
-    Mesh has 0 solution (non-empty) directions (0 0 0)
- ***Number of edges not aligned with or perpendicular to non-empty directions: 7030
-  <<Writing 2541 points on non-aligned edges to set nonAlignedEdges
-    Boundary openness (-1.35774e-16 5.05112e-17 1.03447e-16) OK.
+    Overall domain bounding box (-4.00748 -4 -4) (0 4 4)
+    Mesh has 2 geometric (non-empty/wedge) directions (0 1 1)
+    Mesh has 2 solution (non-empty) directions (0 1 1)
+ ***Number of edges not aligned with or perpendicular to non-empty directions: 23980
+  <<Writing 10131 points on non-aligned edges to set nonAlignedEdges
+    Boundary openness (5.25813e-16 -1.26972e-17 -6.34859e-18) OK.
     Max cell openness = 1.13519e-15 OK.
-    Max aspect ratio = -1 OK.
-    Minimum face area = 4.88481e-05. Maximum face area = 0.13847.  Face area magnitudes OK.
-    Min volume = 7.76169e-05. Max volume = 0.0189546.  Total volume = 12.0858.  Cell volumes OK.
-    Mesh non-orthogonality Max: 36.8583 average: 6.4468
+    Max aspect ratio = 2.98683 OK.
+    Minimum face area = 4.88481e-05. Maximum face area = 0.233612.  Face area magnitudes OK.
+    Min volume = 7.76169e-05. Max volume = 0.079219.  Total volume = 129.64.  Cell volumes OK.
+    Mesh non-orthogonality Max: 36.8583 average: 6.35674
     Non-orthogonality check OK.
     Face pyramids OK.
-    Max skewness = 1.69979 OK.
+    Max skewness = 2.26502 OK.
     Coupled point location match (average 0) OK.
 
 Failed 1 mesh checks.
