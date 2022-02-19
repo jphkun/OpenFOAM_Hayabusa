@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 9-b456138dc4bc
 Exec   : checkMesh -constant
-Date   : Feb 18 2022
-Time   : 17:03:29
+Date   : Feb 19 2022
+Time   : 19:07:02
 Host   : "computer"
-PID    : 89690
+PID    : 7171
 I/O    : uncollated
 Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
 nProcs : 1
@@ -26,18 +26,18 @@ Create polyMesh for time = constant
 Time = constant
 
 Mesh stats
-    points:           10131
-    faces:            28100
-    internal faces:   25900
-    cells:            9000
+    points:           14531
+    faces:            40500
+    internal faces:   37500
+    cells:            13000
     faces per cell:   6
-    boundary patches: 3
+    boundary patches: 4
     point zones:      0
     face zones:       0
     cell zones:       0
 
 Overall number of cells of each type:
-    hexahedra:     9000
+    hexahedra:     13000
     prisms:        0
     wedges:        0
     pyramids:      0
@@ -56,25 +56,26 @@ Checking topology...
 
 Checking patch topology for multiply connected surfaces...
     Patch               Faces    Points   Surface topology                  
-    wall                900      921      ok (non-closed singly connected)  
+    outlet              400      440      ok (non-closed singly connected)  
     inlet               900      921      ok (non-closed singly connected)  
+    wall                1300     1321     ok (non-closed singly connected)  
     defaultFaces        400      440      ok (non-closed singly connected)  
 
 Checking geometry...
-    Overall domain bounding box (-4.00748 -4 -4) (0 4 4)
-    Mesh has 2 geometric (non-empty/wedge) directions (0 1 1)
-    Mesh has 2 solution (non-empty) directions (0 1 1)
- ***Number of edges not aligned with or perpendicular to non-empty directions: 23980
-  <<Writing 10131 points on non-aligned edges to set nonAlignedEdges
-    Boundary openness (5.25813e-16 -1.26972e-17 -6.34859e-18) OK.
-    Max cell openness = 1.13519e-15 OK.
-    Max aspect ratio = 2.98683 OK.
-    Minimum face area = 4.88481e-05. Maximum face area = 0.233612.  Face area magnitudes OK.
-    Min volume = 7.76169e-05. Max volume = 0.079219.  Total volume = 129.64.  Cell volumes OK.
-    Mesh non-orthogonality Max: 36.8583 average: 6.35674
+    Overall domain bounding box (-1.60299 -4 -4) (1.94845 4 4)
+    Mesh has 0 geometric (non-empty/wedge) directions (0 0 0)
+    Mesh has 0 solution (non-empty) directions (0 0 0)
+ ***Number of edges not aligned with or perpendicular to non-empty directions: 41980
+  <<Writing 14531 points on non-aligned edges to set nonAlignedEdges
+    Boundary openness (4.03383e-17 3.39127e-18 1.34758e-17) OK.
+    Max cell openness = 6.47414e-16 OK.
+    Max aspect ratio = -1 OK.
+    Minimum face area = 4.88481e-05. Maximum face area = 0.226486.  Face area magnitudes OK.
+    Min volume = 3.22981e-05. Max volume = 0.0456104.  Total volume = 116.83.  Cell volumes OK.
+    Mesh non-orthogonality Max: 47.7746 average: 25.3198
     Non-orthogonality check OK.
     Face pyramids OK.
-    Max skewness = 2.26502 OK.
+    Max skewness = 2.36706 OK.
     Coupled point location match (average 0) OK.
 
 Failed 1 mesh checks.

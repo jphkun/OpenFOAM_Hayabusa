@@ -161,3 +161,36 @@ class Test_capsule(unittest.TestCase):
         #print(solution)
         for coord, sol in zip(point, solution):
             self.assertAlmostEqual(coord, sol, 5)
+
+    def test_point_on_ellipsoid(self):
+        """
+        Tests if theta is selected correctly
+        """
+        # Test angles
+        theta_000_090 = np.linspace(  np.deg2rad(0),  np.deg2rad(90), 91)
+        theta_091_180 = np.linspace( np.deg2rad(91), np.deg2rad(180), 90)
+        theta_181_270 = np.linspace(np.deg2rad(181), np.deg2rad(270), 90)
+        theta_271_360 = np.linspace(np.deg2rad(271), np.deg2rad(360), 90)
+
+        #print(' ')
+        #print(theta_000_090)
+        #print(theta_091_180)
+        #print(theta_181_270)
+        #print(theta_271_360)
+
+        for ang in theta_000_090:
+            point, cadran = self.capsule.point_on_ellipsoid(ang, 0)
+            self.assertEqual(cadran, 'Front')
+
+        for ang in theta_091_180:
+            point, cadran = self.capsule.point_on_ellipsoid(ang, 0)
+            self.assertEqual(cadran, 'Back')
+
+        for ang in theta_181_270:
+            point, cadran = self.capsule.point_on_ellipsoid(ang, 0)
+            self.assertEqual(cadran, 'Back')
+
+        for ang in theta_271_360:
+            point, cadran = self.capsule.point_on_ellipsoid(ang, 0)
+            self.assertEqual(cadran, 'Front')
+

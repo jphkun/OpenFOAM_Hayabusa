@@ -67,12 +67,12 @@ class Hayabusa:
         self.thetaNpoints = thetaNpoints
         self.phiNpoints = phiNpoints
 
-        # a1, b1, c1, are the "back" ellipsoid semi-axis
+        # a1, b1, c1, are the "front" ellipsoid semi-axis
         self.a1 = 10 * self.capsuleDia
         self.b1 = 10 * self.capsuleDia
         self.c1 = 10 * self.capsuleDia
 
-        # a2, b2, c2, are the "front" ellipsoid semi-axis
+        # a2, b2, c2, are the "back" ellipsoid semi-axis
         self.a2 = 4  * self.capsuleDia
         self.b2 = 10 * self.capsuleDia
         self.c2 = 10 * self.capsuleDia
@@ -144,21 +144,24 @@ class Hayabusa:
         if phi < 0 or phi > np.pi:
             print("Phi is not between 0 and pi")
             sys.exit()
-
-        if theta < np.pi/2 or theta < (3/2)*np.pi: #theta > np.pi/2 or theta > (3/2)*np.pi:
+        x = 0; y = 0; z = 0;
+        # Front ellipsoid
+        if theta <= np.pi/2 or theta > (3/2)*np.pi:
+            cadran = 'Front' # Used in testing
             x = self.a1 * np.cos(theta) * np.sin(phi)
             y = self.b1 * np.sin(theta) * np.sin(phi)
             z = self.c1 * np.cos(phi)
-        elif theta > np.pi/2 or theta > (3/2)*np.pi: #theta < np.pi/2 or theta < (3/2)*np.pi:
+        # Backl ellipsoid
+        elif theta > np.pi/2 or theta >= (3/2)*np.pi:
+            cadran = 'Back' # Used in testing
             x = self.a2 * np.cos(theta) * np.sin(phi)
             y = self.b2 * np.sin(theta) * np.sin(phi)
             z = self.c2 * np.cos(phi)
         else:
             print('Point_on_ellipsoid: Error with phi and theta, they are not in the correct range')
             sys.exit()
-
         point = [x,y,z]
-        return point
+        return point #cadran
 
 
     # TODO: Change the None in a vector
@@ -518,30 +521,32 @@ class Hayabusa:
 
         # Back of the capsule
         # Section 3
-        xBack  = np.linspace(0, sphereOg[0], N)
+        xBack  = np.linspace(sphereOg[0], 0, N)
         self.ccPnts3 = [self.point_on_straight_back(x) for x in xBack]
         # Section 4 
         self.ccPnts4 = []
         # Section 5
         self.ccPnts5 = []
 
-        """
-        plt.figure()
-        print(3*'\n')
-        print([x[0] for x in ccPnts0])
-        print(ccPnts0[0][:])
-        plt.plot([x[0] for x in ccPnts0], [x[2] for x in ccPnts0], 'o')
-        plt.plot([x[0] for x in ccPnts1], [x[2] for x in ccPnts1], 'o')
-        plt.plot([x[0] for x in ccPnts2], [x[2] for x in ccPnts2], 'o')
-        plt.plot([x[0] for x in ccPnts3], [x[2] for x in ccPnts3], 'o')
-        plt.axis('equal')
-        plt.show()
-        """
+        #print(3*'\n')
+        #print([x[0] for x in self.ccPnts0])
+        #print(self.ccPnts0[0][:])
+
+        plotting = False
+        if plotting:
+            plt.figure()
+            plt.plot([x[0] for x in self.ccPnts0], [x[2] for x in self.ccPnts0], 'o')
+            plt.plot([x[0] for x in self.ccPnts1], [x[2] for x in self.ccPnts1], 'o')
+            plt.plot([x[0] for x in self.ccPnts2], [x[2] for x in self.ccPnts2], 'o')
+            plt.plot([x[0] for x in self.ccPnts3], [x[2] for x in self.ccPnts3], 'o')
+            #plt.axis('equal')
+            #plt.show()
 
         # Outside central points, on external mesh
         # Front points
         # Section 0
         self.iocPnts0 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet0]
+        self.DEBUGGING_ANGLES = anglesInlet0
         # Section 1
         self.iocPnts1 = [self.point_on_ellipsoid(np.pi, ang) for ang in anglesInlet1]
         # Section 2
@@ -553,6 +558,16 @@ class Hayabusa:
         self.iocPnts3 = [self.point_on_ellipsoid(0, ang) for ang in anglesOutlet3]
         self.iocPnts4 = []
         self.iocPnts5 = []
+
+        if plotting:
+            #plt.figure()
+            plt.plot([x[0] for x in self.iocPnts0], [x[2] for x in self.iocPnts0], 'o')
+            plt.plot([x[0] for x in self.iocPnts1], [x[2] for x in self.iocPnts1], 'o')
+            plt.plot([x[0] for x in self.iocPnts2], [x[2] for x in self.iocPnts2], 'o')
+            plt.plot([x[0] for x in self.iocPnts3], [x[2] for x in self.iocPnts3], 'o')
+            plt.axis('equal')
+            plt.show()
+            #sys.exit()
 
         """
         self.init_3d_plot()
@@ -571,7 +586,6 @@ class Hayabusa:
         self.plot_points(icPnts1,'g')
         self.plot_points(icPnts2,'b')
         """
-
 
     def rotation_vector(self, e, rot):
         """
@@ -735,6 +749,14 @@ class Hayabusa:
             blk1v4, blk1v5, blk1v6, blk1v7,
         ]
 
+        """
+        # TODO: Get rid of the graph
+        self.init_3d_plot()
+        self.plot_points(self.block1Points, 'c')
+        self.show_plot()
+        """
+        #sys.exit()
+
         # Computes Alpha and Beta for the capsule surface
         # First we need the angle
         vCapsuleFront  = blk1v1 - self.capsuleSphereCenter
@@ -745,12 +767,20 @@ class Hayabusa:
         betaCapsule   = np.arccos(vCapsuleFront[2] / np.linalg.norm(vCapsuleFront))
 
         # Computes Theta and Phi for the inlet surface
-        vInletFront   = blk1v5
+        vInletFront   = blk1v6
         vInletFrontXY = [vInletFront[0], vInletFront[1], 0]
+        #######################################################################
+        # Warning, works only in the first quadrand!
+        #######################################################################
         # Since eX = [1, 0, 0] the angle can be easily found in the following way
-        thetaInlet = np.arccos(vInletFrontXY[0] / np.linalg.norm(vInletFrontXY))
+        theta = np.arccos(vInletFront[2]   / self.c2)
+        thetaInlet = np.arccos(vInletFront[0]/(self.a2*np.sin(theta)))
         # Since eZ = [0, 0, 1] the angle can be easily found in the following way
-        phiInlet   = np.arccos(vInletFront[2]   / np.linalg.norm(vInletFront))
+        phiInlet   = np.arccos(vInletFront[2]   / self.c2)
+
+        print(f'debugging angles:{np.rad2deg(self.DEBUGGING_ANGLES)}')
+        print(f'thetaInlet: {np.rad2deg(thetaInlet)}')
+        print(f'phiInlet:   {np.rad2deg(phiInlet)}')
 
         # TODO: Implement a test for this
         """
@@ -762,11 +792,15 @@ class Hayabusa:
             origin= self.capsuleSphereCenter)
         print(f'p:             {p}')
         print(f'vCapsuleFront: {blk1v2}')
+        """
 
         p = self.point_on_ellipsoid(thetaInlet, phiInlet)
-        print(f'p:  {p}')
-        print(f'vInletBack:    {vInletBack}')
-        """
+        print(f'p:          {p}')
+        print(f'vInletBack: {blk1v6}')
+        #pp = self.point_on_ellipsoid(np.pi, phiInlet)
+        #print(f'pp:         {pp}')
+        for pnt in self.iocPnts0:
+            print(pnt)
 
         N = 10
         theta  = np.pi - thetaInlet
@@ -849,7 +883,7 @@ class Hayabusa:
             Edge(2, 3, self.capsuleSection1quadC1[0]), # Arc Edge
             Edge(3, 0, self.capsuleSection1quad1[4]),  # Arc Edge
             Edge(5, 6, self.ioSection1quad4[::-1]),    # Spline Edge
-            Edge(6, 7, self.ioSection1quadC1[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection1quadC1[0]),      # Arc Edge 
             Edge(7, 4, self.ioSection1quad1),          # Spline Edge
         ]
 
@@ -885,7 +919,7 @@ class Hayabusa:
             # The missing edges are defined in block 1 and 2 
             Edge(2, 3, self.capsuleSection1quadC2[0]), # Arc Edge
             Edge(3, 0, self.capsuleSection1quad2[4]),  # Arc Edge
-            Edge(6, 7, self.ioSection1quadC2[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection1quadC2[0]),      # Arc Edge 
             Edge(7, 4, self.ioSection1quad2),          # Spline Edge
         ]
 
@@ -921,7 +955,7 @@ class Hayabusa:
             # The missing edges are defined in block 1, 2, 3 
             Edge(2, 3, self.capsuleSection1quadC3[0]), # Arc Edge
             Edge(3, 0, self.capsuleSection1quad3[4]),  # Arc Edge
-            Edge(6, 7, self.ioSection1quadC3[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection1quadC3[0]),      # Arc Edge 
             Edge(7, 4, self.ioSection1quad3),          # Spline Edge
         ]
 
@@ -956,7 +990,7 @@ class Hayabusa:
         self.block5Edges = [
             # The missing edges are defined in block 1, 2, 3 
             Edge(2, 3, self.capsuleSection1quadC4[0]), # Arc Edge
-            Edge(6, 7, self.ioSection1quadC4[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection1quadC4[0]),      # Arc Edge 
         ]
 
         self.block5 = Block.create_from_points(self.block5Points, self.block5Edges)
@@ -972,7 +1006,7 @@ class Hayabusa:
         """
         Computes block 6 vertices and points
         """
-        # Computes vertices for block 2
+        # Computes vertices for block 6
         blk6v0 = self.capsuleSection2quad1[-1]
         blk6v1 = self.capsuleSection2quad4[-1]
         blk6v2 = self.capsuleSection2quad4[0]
@@ -990,7 +1024,7 @@ class Hayabusa:
         self.block6Edges = [
             Edge(2, 3, self.capsuleSection2quadC1[0]), # Arc Edge
             Edge(5, 6, self.ioSection2quad4[::-1]),    # Spline Edge
-            Edge(6, 7, self.ioSection2quadC1[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection2quadC1[0]),      # Arc Edge 
             Edge(7, 4, self.ioSection2quad1),          # Spline Edge
         ]
 
@@ -1024,7 +1058,7 @@ class Hayabusa:
 
         self.block7Edges = [
             Edge(2, 3, self.capsuleSection2quadC2[0]), # Arc Edge
-            Edge(6, 7, self.ioSection2quadC2[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection2quadC2[0]),      # Arc Edge 
             Edge(7, 4, self.ioSection2quad2),          # Spline Edge
         ]
 
@@ -1058,7 +1092,7 @@ class Hayabusa:
 
         self.block8Edges = [
             Edge(2, 3, self.capsuleSection2quadC3[0]), # Arc Edge
-            Edge(6, 7, self.ioSection2quadC3[0]),      # Spline Edge
+            Edge(6, 7, self.ioSection2quadC3[0]),      # Arc Edge 
             Edge(7, 4, self.ioSection2quad3),          # Spline Edge
         ]
 
@@ -1109,10 +1143,10 @@ class Hayabusa:
         Computes block 10 vertices and points
         """
         # Computes vertices for block 10
-        blk10v0 = self.capsuleSection3quad1[0]
-        blk10v1 = self.capsuleSection3quad4[0]
-        blk10v2 = self.capsuleSection3quad4[-1]
-        blk10v3 = self.capsuleSection3quad1[-1]
+        blk10v0 = self.capsuleSection3quad1[-1]
+        blk10v1 = self.capsuleSection3quad4[-1]
+        blk10v2 = self.capsuleSection3quad4[0]
+        blk10v3 = self.capsuleSection3quad1[0]
         blk10v4 = self.ioSection3quad1[-1]
         blk10v5 = self.ioSection3quad4[-1]
         blk10v6 = self.ioSection3quad4[0]
@@ -1124,15 +1158,15 @@ class Hayabusa:
         ]
 
         self.block10Edges = [
-            Edge(2, 3, self.capsuleSection3quadC1[-1]), # Arc Edge
-            Edge(5, 6, self.ioSection3quad4[::-1]),     # Spline Edge
-            Edge(6, 7, self.ioSection3quadC1[0]),       # Spline Edge
-            Edge(7, 4, self.ioSection3quad1),           # Spline Edge
+            Edge(2, 3, self.capsuleSection3quadC1[0]), # Arc Edge
+            Edge(5, 6, self.ioSection3quad4[::-1]),    # Spline Edge
+            Edge(6, 7, self.ioSection3quadC1[0]),      # Arc Edge
+            Edge(7, 4, self.ioSection3quad1),          # Spline Edge
         ]
 
         self.block10 = Block.create_from_points(self.block10Points, self.block10Edges)
-        #self.block10.set_patch('top','outlet')
-        #self.block10.set_patch('bottom','wall')
+        self.block10.set_patch('top','outlet')
+        self.block10.set_patch('bottom','wall')
 
         self.block10.chop(0, count=10, c2c_expansion=1)
         self.block10.chop(1, count=10, c2c_expansion=1)
@@ -1144,10 +1178,10 @@ class Hayabusa:
         Computes block 11 vertices and points
         """
         # Computes vertices for block 11
-        blk11v0 = self.capsuleSection3quad2[0]
-        blk11v1 = self.capsuleSection3quad1[0]
-        blk11v2 = self.capsuleSection3quad1[-1]
-        blk11v3 = self.capsuleSection3quad2[-1]
+        blk11v0 = self.capsuleSection3quad2[-1]
+        blk11v1 = self.capsuleSection3quad1[-1]
+        blk11v2 = self.capsuleSection3quad1[0]
+        blk11v3 = self.capsuleSection3quad2[0]
         blk11v4 = self.ioSection3quad2[-1]
         blk11v5 = self.ioSection3quad1[-1]
         blk11v6 = self.ioSection3quad1[0]
@@ -1159,14 +1193,14 @@ class Hayabusa:
         ]
 
         self.block11Edges = [
-            Edge(2, 3, self.capsuleSection3quadC2[-1]), # Arc Edge
-            Edge(6, 7, self.ioSection3quadC2[0]),       # Spline Edge
-            Edge(7, 4, self.ioSection3quad2),           # Spline Edge
+            Edge(2, 3, self.capsuleSection3quadC2[0]), # Arc Edge
+            Edge(6, 7, self.ioSection3quadC2[0]),      # Arc Edge 
+            Edge(7, 4, self.ioSection3quad2),          # Spline Edge
         ]
 
         self.block11 = Block.create_from_points(self.block11Points, self.block11Edges)
-        #self.block11.set_patch('top','outlet')
-        #self.block11.set_patch('bottom','wall')
+        self.block11.set_patch('top','outlet')
+        self.block11.set_patch('bottom','wall')
 
         self.block11.chop(0, count=10, c2c_expansion=1)
         self.block11.chop(1, count=10, c2c_expansion=1)
@@ -1178,10 +1212,10 @@ class Hayabusa:
         Computes block 12 vertices and points
         """
         # Computes vertices for block 12
-        blk12v0 = self.capsuleSection3quad3[0]
-        blk12v1 = self.capsuleSection3quad2[0]
-        blk12v2 = self.capsuleSection3quad2[-1]
-        blk12v3 = self.capsuleSection3quad3[-1]
+        blk12v0 = self.capsuleSection3quad3[-1]
+        blk12v1 = self.capsuleSection3quad2[-1]
+        blk12v2 = self.capsuleSection3quad2[0]
+        blk12v3 = self.capsuleSection3quad3[0]
         blk12v4 = self.ioSection3quad3[-1]
         blk12v5 = self.ioSection3quad2[-1]
         blk12v6 = self.ioSection3quad2[0]
@@ -1193,14 +1227,14 @@ class Hayabusa:
         ]
 
         self.block12Edges = [
-            Edge(2, 3, self.capsuleSection3quadC3[-1]), # Arc Edge
-            Edge(6, 7, self.ioSection3quadC3[0]),       # Spline Edge
-            Edge(7, 4, self.ioSection3quad3),           # Spline Edge
+            Edge(2, 3, self.capsuleSection3quadC3[0]), # Arc Edge
+            Edge(6, 7, self.ioSection3quadC3[0]),      # Arc Edge
+            Edge(7, 4, self.ioSection3quad3),          # Spline Edge
         ]
 
         self.block12 = Block.create_from_points(self.block12Points, self.block12Edges)
-        #self.block12.set_patch('top','outlet')
-        #self.block12.set_patch('bottom','wall')
+        self.block12.set_patch('top','outlet')
+        self.block12.set_patch('bottom','wall')
 
         self.block12.chop(0, count=10, c2c_expansion=1)
         self.block12.chop(1, count=10, c2c_expansion=1)
@@ -1212,32 +1246,29 @@ class Hayabusa:
         Computes block 13 vertices and points
         """
         # Computes vertices for block 13
-        blk13v0 = self.capsuleSection3quad3[0]
-        blk13v1 = self.capsuleSection3quad2[0]
-        blk13v2 = self.capsuleSection3quad2[-1]
-        blk13v3 = self.capsuleSection3quad3[-1]
-        blk13v4 = self.ioSection3quad3[-1]
-        blk13v5 = self.ioSection3quad2[-1]
-        blk13v6 = self.ioSection3quad2[0]
-        blk13v7 = self.ioSection3quad3[0]
+        blk13v0 = self.capsuleSection3quad4[-1]
+        blk13v1 = self.capsuleSection3quad3[-1]
+        blk13v2 = self.capsuleSection3quad3[0]
+        blk13v3 = self.capsuleSection3quad4[0]
+        blk13v4 = self.ioSection3quad4[-1]
+        blk13v5 = self.ioSection3quad3[-1]
+        blk13v6 = self.ioSection3quad3[0]
+        blk13v7 = self.ioSection3quad4[0]
 
         self.block13Points = [
             blk13v0, blk13v1, blk13v2, blk13v3,
             blk13v4, blk13v5, blk13v6, blk13v7,
         ]
-        for pnt in self.block12Points:
-            print(pnt)
-        print(' ')
-        print(self.capsuleSection3quadC1[-1])
+
         self.block13Edges = [
-            Edge(2, 3, self.capsuleSection3quadC3[-1]), # Arc Edge
-            Edge(6, 7, self.ioSection3quadC3[0]),       # Spline Edge
-            Edge(7, 4, self.ioSection3quad3),           # Spline Edge
+            Edge(2, 3, self.capsuleSection3quadC4[0]), # Arc Edge
+            Edge(6, 7, self.ioSection3quadC4[0]),      # Arc Edge 
         ]
+
         #sys.exit()
         self.block13 = Block.create_from_points(self.block13Points, self.block13Edges)
-        #self.block13.set_patch('top','outlet')
-        #self.block13.set_patch('bottom','wall')
+        self.block13.set_patch('top','outlet')
+        self.block13.set_patch('bottom','wall')
 
         self.block13.chop(0, count=10, c2c_expansion=1)
         self.block13.chop(1, count=10, c2c_expansion=1)
@@ -1250,39 +1281,58 @@ class Hayabusa:
 
         """
         mesh = Mesh()
+
         # Computes the upper points of a mesh section
         self.section_points()
+
         # Rotates the computed points in order to get 4 quadrants
         self.central_points_rotation()
+
         # Compute vertices and points for each blocks
+        # Section 0
         self.build_block1()
+        # Section 1
         self.build_block2()
         self.build_block3()
         self.build_block4()
         self.build_block5()
+        # Section 2
         self.build_block6()
         self.build_block7()
         self.build_block8()
         self.build_block9()
+        # Section 3
         self.build_block10()
         self.build_block11()
         self.build_block12()
         self.build_block13()
+        # Section 4
+
+        # Section 5
+
 
         # Assembles the blocks
+        # Section 0
         mesh.add_block(self.block1)
+        # Section 1
         mesh.add_block(self.block2)
         mesh.add_block(self.block3)
         mesh.add_block(self.block4)
         mesh.add_block(self.block5)
+        # Section 2
         mesh.add_block(self.block6)
         mesh.add_block(self.block7)
         mesh.add_block(self.block8)
         mesh.add_block(self.block9)
-        #mesh.add_block(self.block10)
-        #mesh.add_block(self.block11)
-        #mesh.add_block(self.block12)
-        #mesh.add_block(self.block13)
+        # Section 3
+        mesh.add_block(self.block10)
+        mesh.add_block(self.block11)
+        mesh.add_block(self.block12)
+        mesh.add_block(self.block13)
+        # Section 4
+
+        # Section 5
+
 
         mesh.write(output_path=os.path.join('case','system','blockMeshDict'))
         os.system('case/Allrun.mesh')
