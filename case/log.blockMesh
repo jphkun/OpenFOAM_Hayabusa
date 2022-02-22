@@ -2,17 +2,17 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  8
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-Build  : 9-b456138dc4bc
+Build  : 8-1c9b5879390b
 Exec   : blockMesh
-Date   : Feb 19 2022
-Time   : 19:07:02
-Host   : "computer"
-PID    : 7169
+Date   : Feb 22 2022
+Time   : 14:57:52
+Host   : "pc"
+PID    : 30038
 I/O    : uncollated
-Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
+Case   : /home/user/Documents/PhD/PhD_Kuntzer/PhD_Kuntzer/8_CFD/Hayabusa/case
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
 fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
@@ -20,8 +20,6 @@ allowSystemOperations : Allowing user-supplied system call operations
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 Create time
-
-Reading "blockMeshDict"
 
 Creating block mesh from
     "system/blockMeshDict"
@@ -31,17 +29,13 @@ Creating topology blocks
 Creating topology patches
 
 Creating block mesh topology
---> FOAM Warning : 
-    From function Foam::polyMesh::polyMesh(const Foam::IOobject&, Foam::pointField&&, const cellShapeList&, const faceListList&, const wordList&, const Foam::PtrList<Foam::dictionary>&, const Foam::word&, const Foam::word&, bool)
-    in file meshes/polyMesh/polyMeshFromShapeMesh.C at line 873
-    Found 4 undefined faces in mesh; adding to default patch.
 
 Check topology
 
 	Basic statistics
-		Number of internal faces : 24
-		Number of boundary faces : 30
-		Number of defined boundary faces : 30
+		Number of internal faces : 36
+		Number of boundary faces : 36
+		Number of defined boundary faces : 36
 		Number of undefined boundary faces : 0
 	Checking patch -> block consistency
 
@@ -104,23 +98,42 @@ Creating points with scale 1
         i : 0.0313836 .. 0.0313836 0.0301283 .. 0.0301283 0.0910126 .. 0.0910126 0.0895776 
         j : 0.0113137 .. 0.0113137 0.0113137 .. 0.0113137 0.028507 .. 0.0301217 0.0286281 .. 0.029896 
         k : 0.38 .. 0.38 0.38 .. 0.38 0.380776 .. 0.380776 0.380343 .. 0.380343 
+    Block 13 cell size :
+        i : 0.0188302 .. 0.0188302 0.017449 .. 0.017449 0.0717643 .. 0.0717643 0.0675803 .. 0.0675803 
+        j : 0.0073812 .. 0.0073812 0.00782441 .. 0.00782441 0.0254689 .. 0.0273104 0.0280446 .. 0.0294817 
+        k : 0.385625 .. 0.385625 0.385625 .. 0.385625 0.386199 .. 0.386199 0.384885 .. 0.384885 
+    Block 14 cell size :
+        i : 0.0188302 .. 0.0188302 0.017449 .. 0.017449 0.0717643 .. 0.0717643 0.0675803 .. 0.0675803 
+        j : 0.0073812 .. 0.0073812 0.00782441 .. 0.00782441 0.0254689 .. 0.0273104 0.0280446 .. 0.0294817 
+        k : 0.385625 .. 0.385625 0.385625 .. 0.385625 0.386199 .. 0.386199 0.384885 .. 0.384885 
+    Block 15 cell size :
+        i : 0.0188302 .. 0.0188302 0.017449 .. 0.017449 0.0717643 .. 0.0717643 0.0675803 .. 0.0675803 
+        j : 0.0073812 .. 0.0073812 0.00782441 .. 0.00782441 0.0254689 .. 0.0273104 0.0280446 .. 0.0294817 
+        k : 0.385625 .. 0.385625 0.385625 .. 0.385625 0.386199 .. 0.386199 0.384885 .. 0.384885 
+    Block 16 cell size :
+        i : 0.0188302 .. 0.0188302 0.017449 .. 0.017449 0.0717643 .. 0.0717643 0.0675803 .. 0.0675803 
+        j : 0.0073812 .. 0.0073812 0.00782441 .. 0.00782441 0.0254689 .. 0.0273104 0.0280446 .. 0.0294817 
+        k : 0.385625 .. 0.385625 0.385625 .. 0.385625 0.386199 .. 0.386199 0.384885 .. 0.384885 
+    Block 17 cell size :
+        i : 0.288562 .. 0.288562 0.288562 .. 0.288562 0.26032 .. 0.26032 0.26032 
+        j : 0.288562 .. 0.288562 0.288562 .. 0.288562 0.26032 .. 0.26032 0.26032 .. 0.26032 
+        k : 0.390762 .. 0.390762 0.390957 .. 0.390957 0.390957 .. 0.390957 0.391399 .. 0.391399 
 
 Writing polyMesh
 ----------------
 Mesh Information
 ----------------
-  boundingBox: (-1.60299 -4 -4) (1.94845 4 4)
-  nPoints: 14531
-  nCells: 13000
-  nFaces: 40500
-  nInternalFaces: 37500
+  boundingBox: (-1.60299 -4 -4) (4.0192 4 4)
+  nPoints: 19822
+  nCells: 18000
+  nFaces: 55800
+  nInternalFaces: 52200
 ----------------
 Patches
 ----------------
-  patch 0 (start: 37500 size: 400) name: outlet
-  patch 1 (start: 37900 size: 900) name: inlet
-  patch 2 (start: 38800 size: 1300) name: wall
-  patch 3 (start: 40100 size: 400) name: defaultFaces
+  patch 0 (start: 52200 size: 900) name: inlet
+  patch 1 (start: 53100 size: 900) name: outlet
+  patch 2 (start: 54000 size: 1800) name: wall
 
 End
 

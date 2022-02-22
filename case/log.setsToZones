@@ -2,17 +2,17 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  8
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-Build  : 9-b456138dc4bc
+Build  : 8-1c9b5879390b
 Exec   : setsToZones -noFlipMap -constant
-Date   : Feb 19 2022
-Time   : 19:07:02
-Host   : "computer"
-PID    : 7172
+Date   : Feb 22 2022
+Time   : 14:57:53
+Host   : "pc"
+PID    : 30040
 I/O    : uncollated
-Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
+Case   : /home/user/Documents/PhD/PhD_Kuntzer/PhD_Kuntzer/8_CFD/Hayabusa/case
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
 fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
@@ -24,9 +24,9 @@ Create time
 Create polyMesh for time = constant
 
 Searched : "constant/polyMesh/sets"
-Found    : 1(nonAlignedEdges)
+Found    : 1(skewFaces)
 
-Adding set nonAlignedEdges as a pointZone.
+Adding set skewFaces as a faceZone.
 Writing mesh.
 End
 

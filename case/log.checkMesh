@@ -2,17 +2,17 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  8
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-Build  : 9-b456138dc4bc
+Build  : 8-1c9b5879390b
 Exec   : checkMesh -constant
-Date   : Feb 19 2022
-Time   : 19:07:02
-Host   : "computer"
-PID    : 7171
+Date   : Feb 22 2022
+Time   : 14:57:52
+Host   : "pc"
+PID    : 30039
 I/O    : uncollated
-Case   : /media/user/Documents/ZHAW/PhD/CFD/Hayabusa/case
+Case   : /home/user/Documents/PhD/PhD_Kuntzer/PhD_Kuntzer/8_CFD/Hayabusa/case
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
 fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
@@ -26,18 +26,18 @@ Create polyMesh for time = constant
 Time = constant
 
 Mesh stats
-    points:           14531
-    faces:            40500
-    internal faces:   37500
-    cells:            13000
+    points:           19822
+    faces:            55800
+    internal faces:   52200
+    cells:            18000
     faces per cell:   6
-    boundary patches: 4
+    boundary patches: 3
     point zones:      0
     face zones:       0
     cell zones:       0
 
 Overall number of cells of each type:
-    hexahedra:     13000
+    hexahedra:     18000
     prisms:        0
     wedges:        0
     pyramids:      0
@@ -47,7 +47,6 @@ Overall number of cells of each type:
 
 Checking topology...
     Boundary definition OK.
- ***Total number of faces on empty patches is not divisible by the number of cells in the mesh. Hence this mesh is not 1D or 2D.
     Cell to face addressing OK.
     Point usage OK.
     Upper triangular ordering OK.
@@ -56,26 +55,24 @@ Checking topology...
 
 Checking patch topology for multiply connected surfaces...
     Patch               Faces    Points   Surface topology                  
-    outlet              400      440      ok (non-closed singly connected)  
     inlet               900      921      ok (non-closed singly connected)  
-    wall                1300     1321     ok (non-closed singly connected)  
-    defaultFaces        400      440      ok (non-closed singly connected)  
+    outlet              900      921      ok (non-closed singly connected)  
+    wall                1800     1802     ok (closed singly connected)      
 
 Checking geometry...
-    Overall domain bounding box (-1.60299 -4 -4) (1.94845 4 4)
-    Mesh has 0 geometric (non-empty/wedge) directions (0 0 0)
-    Mesh has 0 solution (non-empty) directions (0 0 0)
- ***Number of edges not aligned with or perpendicular to non-empty directions: 41980
-  <<Writing 14531 points on non-aligned edges to set nonAlignedEdges
-    Boundary openness (4.03383e-17 3.39127e-18 1.34758e-17) OK.
-    Max cell openness = 6.47414e-16 OK.
-    Max aspect ratio = -1 OK.
-    Minimum face area = 4.88481e-05. Maximum face area = 0.226486.  Face area magnitudes OK.
-    Min volume = 3.22981e-05. Max volume = 0.0456104.  Total volume = 116.83.  Cell volumes OK.
-    Mesh non-orthogonality Max: 47.7746 average: 25.3198
+    Overall domain bounding box (-1.60299 -4 -4) (4.0192 4 4)
+    Mesh has 3 geometric (non-empty/wedge) directions (1 1 1)
+    Mesh has 3 solution (non-empty) directions (1 1 1)
+    Boundary openness (1.21231e-16 1.04072e-17 1.86919e-17) OK.
+    Max cell openness = 1.24376e-15 OK.
+    Max aspect ratio = 9.48684 OK.
+    Minimum face area = 4.26667e-05. Maximum face area = 0.226486.  Face area magnitudes OK.
+    Min volume = 3.22981e-05. Max volume = 0.0508773.  Total volume = 182.873.  Cell volumes OK.
+    Mesh non-orthogonality Max: 47.7746 average: 21.9972
     Non-orthogonality check OK.
     Face pyramids OK.
-    Max skewness = 2.36706 OK.
+ ***Max skewness = 4.2128, 40 highly skew faces detected which may impair the quality of the results
+  <<Writing 40 skew faces to set skewFaces
     Coupled point location match (average 0) OK.
 
 Failed 1 mesh checks.

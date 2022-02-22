@@ -1,7 +1,12 @@
 from src.capsule import Hayabusa
 
 def main():
-    mesh = Hayabusa(0.2,10,10,10)
+    mesh = Hayabusa(
+        capsuleDia=0.2,
+        rNpoints=10,
+        thetaNpoints=10,
+        phiNpoints=10
+    )
     mesh.mesh_3D()
 
 

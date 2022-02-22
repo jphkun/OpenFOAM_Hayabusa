@@ -6,7 +6,7 @@
 #
 #                         #p5
 #        #p3            #    #                p8
-#                     #        #p7             
+#                     #        #p7
 #           b1      #p4   y    #
 #                  #      |    #
 #     #p2          #p1    #->x #p10            p9
@@ -26,20 +26,8 @@ from classy_blocks.classes.primitives import Edge
 
 from classy_blocks.util import functions as f
 
-
-# TODO create a logger class
-# TODO: Finish the circle function
-# TODO: Document the cirlce function
-# TODO: Test 5 configurations of the circle function
-# TODO: Finish block 2
-# TODO: Finish block 3
-# TODO: Finish block 4
-# TODO: Finish block 5
-
 class Hayabusa:
 
-    # TODO: Connect the capsuleDia input into the class
-    # TODO: Verify that the main.py file has the correct input
 
     def __init__(self,
                  capsuleDia: float,
@@ -78,9 +66,13 @@ class Hayabusa:
         self.c2 = 10 * self.capsuleDia
 
 
-    # TODO: Wring type hinting output
+    # TODO: Wrong type hinting output
 
-    def point_on_sphere(self, rho: float, theta: float, phi: float, origin=[0,0,0]) -> None:
+    def point_on_sphere(self,
+                        rho: float,
+                        theta: float,
+                        phi: float,
+                        origin=[0,0,0]) -> None:
         """
         Returns a point [x,y,z] array of the asked point on the sphere
 
@@ -151,7 +143,7 @@ class Hayabusa:
             x = self.a1 * np.cos(theta) * np.sin(phi)
             y = self.b1 * np.sin(theta) * np.sin(phi)
             z = self.c1 * np.cos(phi)
-        # Backl ellipsoid
+        # Back ellipsoid
         elif theta > np.pi/2 or theta >= (3/2)*np.pi:
             cadran = 'Back' # Used in testing
             x = self.a2 * np.cos(theta) * np.sin(phi)
@@ -170,6 +162,7 @@ class Hayabusa:
         """
         https://math.stackexchange.com/questions/643130/circle-on-sphere
         https://mathworld.wolfram.com/SphericalCoordinates.html
+
         Parameters
         ----------
         rho: float
@@ -182,6 +175,7 @@ class Hayabusa:
             angle from the x-axis on the XY plane
         t: float
             angle on the cricle
+
         Returns
         -------
         point: vector
@@ -432,9 +426,29 @@ class Hayabusa:
         point = [x, y, z]
         return point
 
-    # TODO: On traversera le pont rendu à la rivière
-    def point_vertical_back():
-        pass
+
+    # TODO: Documentation + type defining
+    def point_on_vertical_back(self, z:float):
+        """
+        This function converts the vertical point z which is inserted as an
+        input, to a 3D point.
+
+        Parameters
+        ----------
+        z: float
+            Vertical position of the point on the back part of the capsule.
+
+        Return
+        ------
+        point: array
+            3D point of the back of the capusle
+        """
+        x = self.capsuleSphereCenter[0]
+        y = 0
+        z = z
+        point = [x, y, z]
+        return point
+
 
     # TODO: Documentation
     # TODO: Logic semplification
@@ -443,71 +457,82 @@ class Hayabusa:
 
         """
         # TODO: Generalize the sphere origin
+        # tODO: Clarify this mess
         sphereOg = [0.08, 0, 0]
-        # New code
+
         #######################################################################
         # WARNING all the following points are in the negative x direction
         # hence add 180 deg for the correct point description in spherical
         # coordinates.
         #######################################################################
-        # Capsules points bottom
+
+        # Section 1 angles (alpha) bottom (bot)
         # Angle between the XY plane the sphere origin and vertex 3 of the block 1
-        block2AlphaBot1 = np.arcsin(1/4)
-        block2AlphaBot2 = np.pi + block2AlphaBot1
-        print(f'block2AlphaBot  [deg]: {np.rad2deg(block2AlphaBot1):.4f}')
-        print(f'block2ThetaBot  [deg]: {np.rad2deg(block2AlphaBot2):.4f}')
+        section1AlphaBot1 = np.arcsin(1/4)
+        section1AlphaBot2 = np.pi + section1AlphaBot1
+
         # Angle between the XZ plane the sphere origin and vertex 3 of the block 1
-        block2BetaBot1 = np.arcsin(1/4)
-        block2BetaBot2 = np.pi/2 - block2BetaBot1 # To be used in point_on_sphere
-        print(f'block2BetaBot   [deg]: {np.rad2deg(block2BetaBot1):.4f}')
-        print(f'block2PhiBot    [deg]: {np.rad2deg(block2BetaBot2):.4f}')
+        section1BetaBot1 = np.arcsin(1/4)
+        section1BetaBot2 = np.pi/2 - section1BetaBot1
 
         # Inlet points
         # Angle between the XY plane the MESH origin and vertex 7? 4? of the block 1
-        block2ThetaBot1 = self.angle_conversion(block2AlphaBot1)
-        block2ThetaBot2 = np.pi + block2ThetaBot1
-        print(f'block2ThetaBot1 [deg]: {np.rad2deg(block2ThetaBot1):.4f}')
-        print(f'block2ThetaBot2 [deg]: {np.rad2deg(block2ThetaBot2):.4f}')
+        section1ThetaBot1 = self.angle_conversion(section1AlphaBot1)
+        section1ThetaBot2 =  np.pi + section1ThetaBot1
+
         # Angle between the XZ plane the MESH origin and vertex 7? 4? of the block 1
-        block2PhiBot1 = self.angle_conversion(block2BetaBot1)
-        block2PhiBot2 = np.pi/2 - block2PhiBot1 # To use in point_on_ellipsoid
-        print(f'block2PhiBot1   [deg]: {np.rad2deg(block2PhiBot1):.4f}')
-        print(f'block2PhiBot2   [deg]: {np.rad2deg(block2PhiBot2):.4f}')
+        section1PhiBot1 = self.angle_conversion(section1BetaBot1)
+        section1PhiBot2 = np.pi/2 - section1PhiBot1
 
         # Capsule points top
         # Angle between teh XY plane, the sphere origin, and the center point
         # of the edge between vertex 1 and vertex 2.
-        block2BetaTop1 = np.pi - 2 * np.arctan(2)
-        block2BetaTop2 = np.pi - 2 * np.arctan(3)
-        block2PhiTop1 = np.pi/2 - block2BetaTop1
-        block2PhiTop2 = np.pi/2 - block2BetaTop2
-        print(f'block2beta1     [deg]: {np.rad2deg(block2BetaTop1):.4f}')
-        print(f'block2Beta2     [deg]: {np.rad2deg(block2BetaTop2):.4f}')
-        print(f'block2Phi1      [deg]: {np.rad2deg(block2PhiTop1):.4f}')
-        print(f'block2Phi2      [deg]: {np.rad2deg(block2PhiTop2):.4f}')
+        section1BetaTop1 = np.pi - 2 * np.arctan(2)
+        section1BetaTop2 = np.pi - 2 * np.arctan(3)
+        section1PhiTop1 = np.pi/2 - section1BetaTop1
+        section1PhiTop2 = np.pi/2 - section1BetaTop2
+
+        #print(f'block2beta1       [deg]: {np.rad2deg(block2BetaTop1):.4f}')
+        #print(f'section1BetaTop1  [deg]: {np.rad2deg(section1BetaTop1):.4f}')
+        #print(f'block2Beta2       [deg]: {np.rad2deg(block2BetaTop2):.4f}')
+        #print(f'section1BetaTop2  [deg]: {np.rad2deg(section1BetaTop2):.4f}')
+        #print(f'block2Phi1        [deg]: {np.rad2deg(block2PhiTop1):.4f}')
+        #print(f'section1PhiTop1   [deg]: {np.rad2deg(section1PhiTop1):.4f}')
+        #print(f'block2Phi2        [deg]: {np.rad2deg(block2PhiTop2):.4f}')
+        #print(f'section1PhiTop2   [deg]: {np.rad2deg(section1PhiTop2):.4f}')
 
         # Outlet points top
         # TODO: Block section 3 and not block 3
         l = self.capsuleSphereCenter[0] / np.sqrt(2)
         m = self.capsuleRad - l
-        blockS3PhiBot = np.arctan(self.capsuleSphereCenter[0] / m)
-        print(f'blockS3PhiBot: {np.rad2deg(blockS3PhiBot)}')
+        section3PhiBot = np.arctan(self.capsuleSphereCenter[0] / m)
+        # TODO: Optimise angle
+        section4PhiBot1 = np.deg2rad(60)
+        section4PhiBot2 = np.pi/2 - section4PhiBot1
+        section5PhiBot1 = np.deg2rad(90)
+        section5PhiBot2 = np.pi/2 - section5PhiBot1
 
         # Computation of 10 angles "central point" between the edges01 and edges 45
         N = 10
-        anglesCapsule0 = np.linspace(np.pi/2, block2BetaBot2, N)
-        anglesCapsule1 = np.linspace(block2BetaTop1, block2BetaBot2, N) # From "Top" to "Bottom"
-        print(f'anglesCapsule0  [deg]:\n {np.rad2deg(anglesCapsule0)}')
-        print(f'anglesCapsule1  [deg]:\n {np.rad2deg(anglesCapsule1)}')
+        anglesCapsule0 = np.linspace(np.pi/2, section1BetaBot2, N)
+        # From "Top" to "Bottom"
+        anglesCapsule1 = np.linspace(section1BetaTop1, section1BetaBot2, N)
+        #print(f'anglesCapsule0  [deg]:\n {np.rad2deg(anglesCapsule0)}')
+        #print(f'anglesCapsule1  [deg]:\n {np.rad2deg(anglesCapsule1)}')
 
-        anglesInlet0  = np.linspace(block2PhiBot2,       np.pi/2, N)
-        anglesInlet1  = np.linspace(block2PhiTop2, block2PhiBot2, N)
-        anglesInlet2  = np.linspace(            0, block2PhiTop2, N)
-        anglesOutlet3 = np.linspace(blockS3PhiBot,             0, N)
-        print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet0)}')
-        print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet1)}')
-        print(f'anglesInlet    [deg]:\n {np.rad2deg(anglesInlet2)}')
-
+        anglesInlet0  = np.linspace(section1PhiBot2, np.pi/2,         N)
+        anglesInlet1  = np.linspace(section1PhiTop2, section1PhiBot2, N)
+        anglesInlet2  = np.linspace(0,               section1PhiTop2, N)
+        anglesOutlet3 = np.linspace(section3PhiBot, 0,                N)
+        anglesOutlet4 = np.linspace(section4PhiBot1, section3PhiBot,  N)
+        anglesOutlet5 = np.linspace(section5PhiBot1, section4PhiBot1, N)
+        print(f'anglesInlet0  [deg]:\n {np.rad2deg(anglesInlet0)}')
+        print(f'anglesInlet1  [deg]:\n {np.rad2deg(anglesInlet1)}')
+        print(f'anglesInlet2  [deg]:\n {np.rad2deg(anglesInlet2)}')
+        print(f'anglesOutlet3 [deg]:\n {np.rad2deg(anglesOutlet3)}')
+        print(f'anglesOutlet4 [deg]:\n {np.rad2deg(anglesOutlet4)}')
+        print(f'anglesOutlet5 [deg]:\n {np.rad2deg(anglesOutlet5)}')
+        #sys.exit()
         # Central points on wall/capsule
 
         # Front of the capsule
@@ -523,22 +548,35 @@ class Hayabusa:
         # Section 3
         xBack  = np.linspace(sphereOg[0], 0, N)
         self.ccPnts3 = [self.point_on_straight_back(x) for x in xBack]
-        # Section 4 
-        self.ccPnts4 = []
+        # Section 4
+        zTop = self.ccPnts3[0][-1]
+        zBot = self.capsuleSphereCenter[0] * np.tan(section4PhiBot2)
+        zBackS4 = np.linspace(zBot, zTop, N)
+        self.ccPnts4 = [self.point_on_vertical_back(z) for z in zBackS4]
+        print(f'zTop: {zTop}')
+        print(f'zBot: {zBot}')
+        print(f'zBackS4: {zBackS4}')
+        print(f'{self.ccPnts4}')
         # Section 5
-        self.ccPnts5 = []
+        zTop = self.capsuleSphereCenter[0] * np.tan(section4PhiBot2)
+        zBot = 0
+        zBackS5 = np.linspace(zBot, zTop, N)
+        self.ccPnts5 = [self.point_on_vertical_back(z) for z in zBackS5]
 
         #print(3*'\n')
         #print([x[0] for x in self.ccPnts0])
         #print(self.ccPnts0[0][:])
 
         plotting = False
-        if plotting:
+        plot1 = False
+        if plotting or plot1:
             plt.figure()
             plt.plot([x[0] for x in self.ccPnts0], [x[2] for x in self.ccPnts0], 'o')
             plt.plot([x[0] for x in self.ccPnts1], [x[2] for x in self.ccPnts1], 'o')
             plt.plot([x[0] for x in self.ccPnts2], [x[2] for x in self.ccPnts2], 'o')
             plt.plot([x[0] for x in self.ccPnts3], [x[2] for x in self.ccPnts3], 'o')
+            plt.plot([x[0] for x in self.ccPnts4], [x[2] for x in self.ccPnts4], 'o')
+            plt.plot([x[0] for x in self.ccPnts5], [x[2] for x in self.ccPnts5], 'o')
             #plt.axis('equal')
             #plt.show()
 
@@ -556,28 +594,32 @@ class Hayabusa:
         # Section 3
         print(f'anglesOutlet3: {np.rad2deg(anglesOutlet3)}')
         self.iocPnts3 = [self.point_on_ellipsoid(0, ang) for ang in anglesOutlet3]
-        self.iocPnts4 = []
-        self.iocPnts5 = []
+        self.iocPnts4 = [self.point_on_ellipsoid(0, ang) for ang in anglesOutlet4]
+        self.iocPnts5 = [self.point_on_ellipsoid(0, ang) for ang in anglesOutlet5]
 
-        if plotting:
+        if plotting or plot1:
             #plt.figure()
             plt.plot([x[0] for x in self.iocPnts0], [x[2] for x in self.iocPnts0], 'o')
             plt.plot([x[0] for x in self.iocPnts1], [x[2] for x in self.iocPnts1], 'o')
             plt.plot([x[0] for x in self.iocPnts2], [x[2] for x in self.iocPnts2], 'o')
             plt.plot([x[0] for x in self.iocPnts3], [x[2] for x in self.iocPnts3], 'o')
+            plt.plot([x[0] for x in self.iocPnts4], [x[2] for x in self.iocPnts4], 'o')
+            plt.plot([x[0] for x in self.iocPnts5], [x[2] for x in self.iocPnts5], 'o')
+
             plt.axis('equal')
             plt.show()
             #sys.exit()
 
-        """
-        self.init_3d_plot()
-        self.plot_points(ccPnts0,'r')
-        self.plot_points(ccPnts1,'g')
-        self.plot_points(ccPnts2,'b')
-        self.plot_points(ccPnts3,'c')
-        self.plot_points(ccPnts4,'m')
-        self.show_plot()
-        """
+        plot2 = False
+        if plotting or plot2:
+            self.init_3d_plot()
+            self.plot_points(self.ccPnts0,'r')
+            self.plot_points(self.ccPnts1,'g')
+            self.plot_points(self.ccPnts2,'b')
+            self.plot_points(self.ccPnts3,'c')
+            self.plot_points(self.ccPnts4,'m')
+            self.show_plot()
+
         """
         self.plot_points(ccPnts0,'r')
         self.plot_points(ccPnts1,'g')
@@ -616,7 +658,7 @@ class Hayabusa:
         """
         Rotates the points into each quadrant
         """
-        # Rotation construction 
+        # Rotation construction
         quadrant1Angle = np.deg2rad( 45)
         quadrant1cAngle= np.deg2rad(  0)
         quadrant2Angle = np.deg2rad(135)
@@ -673,7 +715,6 @@ class Hayabusa:
         self.capsuleSection2quadC3 = self.rotQuatC3.apply(self.ccPnts2)
         self.capsuleSection2quad4  = self.rotQuat4.apply(self.ccPnts2)
         self.capsuleSection2quadC4 = self.rotQuatC4.apply(self.ccPnts2)
-
         # Section 3
         self.capsuleSection3quad1  = self.rotQuat1.apply(self.ccPnts3)
         self.capsuleSection3quadC1 = self.rotQuatC1.apply(self.ccPnts3)
@@ -683,9 +724,24 @@ class Hayabusa:
         self.capsuleSection3quadC3 = self.rotQuatC3.apply(self.ccPnts3)
         self.capsuleSection3quad4  = self.rotQuat4.apply(self.ccPnts3)
         self.capsuleSection3quadC4 = self.rotQuatC4.apply(self.ccPnts3)
-
         # Section 4
+        self.capsuleSection4quad1  = self.rotQuat1.apply(self.ccPnts4)
+        self.capsuleSection4quadC1 = self.rotQuatC1.apply(self.ccPnts4)
+        self.capsuleSection4quad2  = self.rotQuat2.apply(self.ccPnts4)
+        self.capsuleSection4quadC2 = self.rotQuatC2.apply(self.ccPnts4)
+        self.capsuleSection4quad3  = self.rotQuat3.apply(self.ccPnts4)
+        self.capsuleSection4quadC3 = self.rotQuatC3.apply(self.ccPnts4)
+        self.capsuleSection4quad4  = self.rotQuat4.apply(self.ccPnts4)
+        self.capsuleSection4quadC4 = self.rotQuatC4.apply(self.ccPnts4)
         # Section 5
+        self.capsuleSection5quad1  = self.rotQuat1.apply(self.ccPnts5)
+        self.capsuleSection5quadC1 = self.rotQuatC1.apply(self.ccPnts5)
+        self.capsuleSection5quad2  = self.rotQuat2.apply(self.ccPnts5)
+        self.capsuleSection5quadC2 = self.rotQuatC2.apply(self.ccPnts5)
+        self.capsuleSection5quad3  = self.rotQuat3.apply(self.ccPnts5)
+        self.capsuleSection5quadC3 = self.rotQuatC3.apply(self.ccPnts5)
+        self.capsuleSection5quad4  = self.rotQuat4.apply(self.ccPnts5)
+        self.capsuleSection5quadC4 = self.rotQuatC4.apply(self.ccPnts5)
 
         # Saves the rotated inlet construction points
         # Section 0
@@ -693,7 +749,6 @@ class Hayabusa:
         self.ioSection0quad2 = self.rotQuat2.apply(self.iocPnts0)
         self.ioSection0quad3 = self.rotQuat3.apply(self.iocPnts0)
         self.ioSection0quad4 = self.rotQuat4.apply(self.iocPnts0)
-
         # Section 1
         self.ioSection1quad1 = self.rotQuat1.apply(self.iocPnts1)
         self.ioSection1quadC1= self.rotQuatC1.apply(self.iocPnts1)
@@ -703,7 +758,6 @@ class Hayabusa:
         self.ioSection1quadC3= self.rotQuatC3.apply(self.iocPnts1)
         self.ioSection1quad4 = self.rotQuat4.apply(self.iocPnts1)
         self.ioSection1quadC4= self.rotQuatC4.apply(self.iocPnts1)
-
         # Section 2
         self.ioSection2quad1 = self.rotQuat1.apply(self.iocPnts2)
         self.ioSection2quadC1= self.rotQuatC1.apply(self.iocPnts2)
@@ -713,7 +767,6 @@ class Hayabusa:
         self.ioSection2quadC3= self.rotQuatC3.apply(self.iocPnts2)
         self.ioSection2quad4 = self.rotQuat4.apply(self.iocPnts2)
         self.ioSection2quadC4= self.rotQuatC4.apply(self.iocPnts2)
-
         # Section 3
         self.ioSection3quad1 = self.rotQuat1.apply(self.iocPnts3)
         self.ioSection3quadC1= self.rotQuatC1.apply(self.iocPnts3)
@@ -723,13 +776,28 @@ class Hayabusa:
         self.ioSection3quadC3= self.rotQuatC3.apply(self.iocPnts3)
         self.ioSection3quad4 = self.rotQuat4.apply(self.iocPnts3)
         self.ioSection3quadC4= self.rotQuatC4.apply(self.iocPnts3)
-
         # Section 4
+        self.ioSection4quad1 = self.rotQuat1.apply(self.iocPnts4)
+        self.ioSection4quadC1= self.rotQuatC1.apply(self.iocPnts4)
+        self.ioSection4quad2 = self.rotQuat2.apply(self.iocPnts4)
+        self.ioSection4quadC2= self.rotQuatC2.apply(self.iocPnts4)
+        self.ioSection4quad3 = self.rotQuat3.apply(self.iocPnts4)
+        self.ioSection4quadC3= self.rotQuatC3.apply(self.iocPnts4)
+        self.ioSection4quad4 = self.rotQuat4.apply(self.iocPnts4)
+        self.ioSection4quadC4= self.rotQuatC4.apply(self.iocPnts4)
         # Section 5
+        self.ioSection5quad1 = self.rotQuat1.apply(self.iocPnts5)
+        self.ioSection5quadC1= self.rotQuatC1.apply(self.iocPnts5)
+        self.ioSection5quad2 = self.rotQuat2.apply(self.iocPnts5)
+        self.ioSection5quadC2= self.rotQuatC2.apply(self.iocPnts5)
+        self.ioSection5quad3 = self.rotQuat3.apply(self.iocPnts5)
+        self.ioSection5quadC3= self.rotQuatC3.apply(self.iocPnts5)
+        self.ioSection5quad4 = self.rotQuat4.apply(self.iocPnts5)
+        self.ioSection5quadC4= self.rotQuatC4.apply(self.iocPnts5)
+
 
 
     # TODO: Correct all the spline edges that are an arc edge
-
     def build_block1(self):
         """
         Computes vertices and point in order to build block 1.
@@ -749,16 +817,8 @@ class Hayabusa:
             blk1v4, blk1v5, blk1v6, blk1v7,
         ]
 
-        """
-        # TODO: Get rid of the graph
-        self.init_3d_plot()
-        self.plot_points(self.block1Points, 'c')
-        self.show_plot()
-        """
-        #sys.exit()
-
         # Computes Alpha and Beta for the capsule surface
-        # First we need the angle
+        # First we need the vector
         vCapsuleFront  = blk1v1 - self.capsuleSphereCenter
         vCapsuleFrontXY = [vCapsuleFront[0], vCapsuleFront[1], 0]
         # Since eX = [1, 0, 0] the angle can be easily found in the following way
@@ -769,20 +829,21 @@ class Hayabusa:
         # Computes Theta and Phi for the inlet surface
         vInletFront   = blk1v6
         vInletFrontXY = [vInletFront[0], vInletFront[1], 0]
-        #######################################################################
-        # Warning, works only in the first quadrand!
-        #######################################################################
+        # WARNING: works only in the first quadrand!
         # Since eX = [1, 0, 0] the angle can be easily found in the following way
         theta = np.arccos(vInletFront[2]   / self.c2)
         thetaInlet = np.arccos(vInletFront[0]/(self.a2*np.sin(theta)))
         # Since eZ = [0, 0, 1] the angle can be easily found in the following way
         phiInlet   = np.arccos(vInletFront[2]   / self.c2)
 
+        # TODO: Implement a test for this
+
+        """
         print(f'debugging angles:{np.rad2deg(self.DEBUGGING_ANGLES)}')
         print(f'thetaInlet: {np.rad2deg(thetaInlet)}')
         print(f'phiInlet:   {np.rad2deg(phiInlet)}')
+        """
 
-        # TODO: Implement a test for this
         """
         # Test to see if the angles found in spherical coordiantes are correct
         p = self.point_on_sphere(
@@ -794,6 +855,7 @@ class Hayabusa:
         print(f'vCapsuleFront: {blk1v2}')
         """
 
+        """
         p = self.point_on_ellipsoid(thetaInlet, phiInlet)
         print(f'p:          {p}')
         print(f'vInletBack: {blk1v6}')
@@ -801,6 +863,7 @@ class Hayabusa:
         #print(f'pp:         {pp}')
         for pnt in self.iocPnts0:
             print(pnt)
+        """
 
         N = 10
         theta  = np.pi - thetaInlet
@@ -883,7 +946,7 @@ class Hayabusa:
             Edge(2, 3, self.capsuleSection1quadC1[0]), # Arc Edge
             Edge(3, 0, self.capsuleSection1quad1[4]),  # Arc Edge
             Edge(5, 6, self.ioSection1quad4[::-1]),    # Spline Edge
-            Edge(6, 7, self.ioSection1quadC1[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection1quadC1[0]),      # Arc Edge
             Edge(7, 4, self.ioSection1quad1),          # Spline Edge
         ]
 
@@ -916,10 +979,10 @@ class Hayabusa:
         ]
 
         self.block3Edges = [
-            # The missing edges are defined in block 1 and 2 
+            # The missing edges are defined in block 1 and 2
             Edge(2, 3, self.capsuleSection1quadC2[0]), # Arc Edge
             Edge(3, 0, self.capsuleSection1quad2[4]),  # Arc Edge
-            Edge(6, 7, self.ioSection1quadC2[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection1quadC2[0]),      # Arc Edge
             Edge(7, 4, self.ioSection1quad2),          # Spline Edge
         ]
 
@@ -936,7 +999,7 @@ class Hayabusa:
         """
         Computes block 4 vertices and points
         """
-        # Computes vertices for block 2
+        # Computes vertices for block 4
         blk4v0 = self.capsuleSection1quad3[-1]
         blk4v1 = self.capsuleSection1quad2[-1]
         blk4v2 = self.capsuleSection1quad2[0]
@@ -952,10 +1015,10 @@ class Hayabusa:
         ]
 
         self.block4Edges = [
-            # The missing edges are defined in block 1, 2, 3 
+            # The missing edges are defined in block 1, 2, 3
             Edge(2, 3, self.capsuleSection1quadC3[0]), # Arc Edge
             Edge(3, 0, self.capsuleSection1quad3[4]),  # Arc Edge
-            Edge(6, 7, self.ioSection1quadC3[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection1quadC3[0]),      # Arc Edge
             Edge(7, 4, self.ioSection1quad3),          # Spline Edge
         ]
 
@@ -988,9 +1051,9 @@ class Hayabusa:
         ]
 
         self.block5Edges = [
-            # The missing edges are defined in block 1, 2, 3 
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection1quadC4[0]), # Arc Edge
-            Edge(6, 7, self.ioSection1quadC4[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection1quadC4[0]),      # Arc Edge
         ]
 
         self.block5 = Block.create_from_points(self.block5Points, self.block5Edges)
@@ -1022,9 +1085,10 @@ class Hayabusa:
         ]
 
         self.block6Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection2quadC1[0]), # Arc Edge
             Edge(5, 6, self.ioSection2quad4[::-1]),    # Spline Edge
-            Edge(6, 7, self.ioSection2quadC1[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection2quadC1[0]),      # Arc Edge
             Edge(7, 4, self.ioSection2quad1),          # Spline Edge
         ]
 
@@ -1041,7 +1105,7 @@ class Hayabusa:
         """
         Computes block 7 vertices and points
         """
-        # Computes vertices for block 2
+        # Computes vertices for block 7
         blk7v0 = self.capsuleSection2quad2[-1]
         blk7v1 = self.capsuleSection2quad1[-1]
         blk7v2 = self.capsuleSection2quad1[0]
@@ -1057,8 +1121,9 @@ class Hayabusa:
         ]
 
         self.block7Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection2quadC2[0]), # Arc Edge
-            Edge(6, 7, self.ioSection2quadC2[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection2quadC2[0]),      # Arc Edge
             Edge(7, 4, self.ioSection2quad2),          # Spline Edge
         ]
 
@@ -1075,7 +1140,7 @@ class Hayabusa:
         """
         Computes block 8 vertices and points
         """
-        # Computes vertices for block 2
+        # Computes vertices for block 8
         blk8v0 = self.capsuleSection2quad3[-1]
         blk8v1 = self.capsuleSection2quad2[-1]
         blk8v2 = self.capsuleSection2quad2[0]
@@ -1091,8 +1156,9 @@ class Hayabusa:
         ]
 
         self.block8Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection2quadC3[0]), # Arc Edge
-            Edge(6, 7, self.ioSection2quadC3[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection2quadC3[0]),      # Arc Edge
             Edge(7, 4, self.ioSection2quad3),          # Spline Edge
         ]
 
@@ -1109,7 +1175,7 @@ class Hayabusa:
         """
         Computes block 9 vertices and points
         """
-        # Computes vertices for block 2
+        # Computes vertices for block 9
         blk9v0 = self.capsuleSection2quad4[-1]
         blk9v1 = self.capsuleSection2quad3[-1]
         blk9v2 = self.capsuleSection2quad3[0]
@@ -1125,8 +1191,9 @@ class Hayabusa:
         ]
 
         self.block9Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection2quadC4[0]), # Arc Edge
-            Edge(6, 7, self.ioSection2quadC4[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection2quadC4[0]),      # Arc Edge
         ]
 
         self.block9 = Block.create_from_points(self.block9Points, self.block9Edges)
@@ -1156,8 +1223,11 @@ class Hayabusa:
             blk10v0, blk10v1, blk10v2, blk10v3,
             blk10v4, blk10v5, blk10v6, blk10v7,
         ]
-
+        print('\n block10')
+        for pnt in self.block10Points:
+            print(pnt)
         self.block10Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection3quadC1[0]), # Arc Edge
             Edge(5, 6, self.ioSection3quad4[::-1]),    # Spline Edge
             Edge(6, 7, self.ioSection3quadC1[0]),      # Arc Edge
@@ -1193,8 +1263,9 @@ class Hayabusa:
         ]
 
         self.block11Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection3quadC2[0]), # Arc Edge
-            Edge(6, 7, self.ioSection3quadC2[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection3quadC2[0]),      # Arc Edge
             Edge(7, 4, self.ioSection3quad2),          # Spline Edge
         ]
 
@@ -1227,6 +1298,7 @@ class Hayabusa:
         ]
 
         self.block12Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection3quadC3[0]), # Arc Edge
             Edge(6, 7, self.ioSection3quadC3[0]),      # Arc Edge
             Edge(7, 4, self.ioSection3quad3),          # Spline Edge
@@ -1261,8 +1333,9 @@ class Hayabusa:
         ]
 
         self.block13Edges = [
+            # The missing edges are defined in previous blocks
             Edge(2, 3, self.capsuleSection3quadC4[0]), # Arc Edge
-            Edge(6, 7, self.ioSection3quadC4[0]),      # Arc Edge 
+            Edge(6, 7, self.ioSection3quadC4[0]),      # Arc Edge
         ]
 
         #sys.exit()
@@ -1275,10 +1348,248 @@ class Hayabusa:
         self.block13.chop(2, count=10, c2c_expansion=1)
 
 
+    def build_block14(self):
+        """ 
+        Computes block 14 vertices and points
+        """
+        # Computes vertices for block 14
+        blk14v0 = self.capsuleSection4quad1[-1]
+        blk14v1 = self.capsuleSection4quad4[-1]
+        blk14v2 = self.capsuleSection4quad4[0]
+        blk14v3 = self.capsuleSection4quad1[0]
+        blk14v4 = self.ioSection4quad1[-1]
+        blk14v5 = self.ioSection4quad4[-1]
+        blk14v6 = self.ioSection4quad4[0]
+        blk14v7 = self.ioSection4quad1[0]
+
+        self.block14Points = [
+            blk14v0, blk14v1, blk14v2, blk14v3,
+            blk14v4, blk14v5, blk14v6, blk14v7,
+        ]
+
+        self.block14Edges = [
+            # The missing edges are defined in previous blocks
+            #Edge(2, 3, self.capsuleSection4quadC1[0]), # Arc Edge
+            Edge(5, 6, self.ioSection4quad4[::-1]),    # Spline Edge
+            #Edge(6, 7, self.ioSection4quadC1[0]),      # Arc Edge
+            Edge(7, 4, self.ioSection4quad1),          # Spline Edge
+        ]
+
+        self.block14 = Block.create_from_points(self.block14Points, self.block14Edges)
+        self.block14.set_patch('top','outlet')
+        self.block14.set_patch('bottom','wall')
+
+        self.block14.chop(0, count=10, c2c_expansion=1)
+        self.block14.chop(1, count=10, c2c_expansion=1)
+        self.block14.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block15(self):
+        """ 
+        Computes block 15 vertices and points
+        """
+        # Computes vertices for block 15
+        blk15v0 = self.capsuleSection4quad2[-1]
+        blk15v1 = self.capsuleSection4quad1[-1]
+        blk15v2 = self.capsuleSection4quad1[0]
+        blk15v3 = self.capsuleSection4quad2[0]
+        blk15v4 = self.ioSection4quad2[-1]
+        blk15v5 = self.ioSection4quad1[-1]
+        blk15v6 = self.ioSection4quad1[0]
+        blk15v7 = self.ioSection4quad2[0]
+
+        self.block15Points = [
+            blk15v0, blk15v1, blk15v2, blk15v3,
+            blk15v4, blk15v5, blk15v6, blk15v7,
+        ]
+
+        self.block15Edges = [
+            # The missing edges are defined in previous blocks
+            #Edge(2, 3, self.capsuleSection4quadC2[0]), # Arc Edge
+            #Edge(6, 7, self.ioSection4quadC2[0]),      # Arc Edge
+            Edge(7, 4, self.ioSection4quad2),          # Spline Edge
+        ]
+
+        self.block15 = Block.create_from_points(self.block15Points, self.block15Edges)
+        self.block15.set_patch('top','outlet')
+        self.block15.set_patch('bottom','wall')
+
+        self.block15.chop(0, count=10, c2c_expansion=1)
+        self.block15.chop(1, count=10, c2c_expansion=1)
+        self.block15.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block16(self):
+        """
+        Computes block 16 vertices and points
+        """
+        # Computes vertices for block 16
+        blk16v0 = self.capsuleSection4quad3[-1]
+        blk16v1 = self.capsuleSection4quad2[-1]
+        blk16v2 = self.capsuleSection4quad2[0]
+        blk16v3 = self.capsuleSection4quad3[0]
+        blk16v4 = self.ioSection4quad3[-1]
+        blk16v5 = self.ioSection4quad2[-1]
+        blk16v6 = self.ioSection4quad2[0]
+        blk16v7 = self.ioSection4quad3[0]
+
+        self.block16Points = [
+            blk16v0, blk16v1, blk16v2, blk16v3,
+            blk16v4, blk16v5, blk16v6, blk16v7,
+        ]
+
+        self.block16Edges = [
+            # The missing edges are defined in previous blocks
+            #Edge(2, 3, self.capsuleSection4quadC3[0]), # Arc Edge
+            #Edge(6, 7, self.ioSection4quadC3[0]),      # Arc Edge
+            Edge(7, 4, self.ioSection4quad3),          # Spline Edge
+        ]
+
+        self.block16 = Block.create_from_points(self.block16Points, self.block16Edges)
+        self.block16.set_patch('top','outlet')
+        self.block16.set_patch('bottom','wall')
+
+        self.block16.chop(0, count=10, c2c_expansion=1)
+        self.block16.chop(1, count=10, c2c_expansion=1)
+        self. block16.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block17(self):
+        """
+        Computes block 13 vertices and points
+        """
+        # Computes vertices for block 13
+        blk17v0 = self.capsuleSection4quad4[-1]
+        blk17v1 = self.capsuleSection4quad3[-1]
+        blk17v2 = self.capsuleSection4quad3[0]
+        blk17v3 = self.capsuleSection4quad4[0]
+        blk17v4 = self.ioSection4quad4[-1]
+        blk17v5 = self.ioSection4quad3[-1]
+        blk17v6 = self.ioSection4quad3[0]
+        blk17v7 = self.ioSection4quad4[0]
+
+        self.block17Points = [
+            blk17v0, blk17v1, blk17v2, blk17v3,
+            blk17v4, blk17v5, blk17v6, blk17v7,
+        ]
+
+        self.block17Edges = [
+            # The missing edges are defined in previous blocks
+            #Edge(2, 3, self.capsuleSection4quadC4[0]), # Arc Edge
+            #Edge(6, 7, self.ioSection4quadC4[0]),      # Arc Edge
+        ]
+
+        self.block17 = Block.create_from_points(self.block17Points, self.block17Edges)
+        self.block17.set_patch('top','outlet')
+        self.block17.set_patch('bottom','wall')
+
+        self.block17.chop(0, count=10, c2c_expansion=1)
+        self.block17.chop(1, count=10, c2c_expansion=1)
+        self.block17.chop(2, count=10, c2c_expansion=1)
+
+
+    def build_block18(self):
+        """
+        Computes vertices and point in order to build block 18.
+        """
+        # Computes vertices for block 18
+        blk18v0 = self.capsuleSection5quad1[-1]
+        blk18v1 = self.capsuleSection5quad2[-1]
+        blk18v2 = self.capsuleSection5quad3[-1]
+        blk18v3 = self.capsuleSection5quad4[-1]
+        blk18v4 = self.ioSection5quad1[-1]#[0]
+        blk18v5 = self.ioSection5quad2[-1]#[0]
+        blk18v6 = self.ioSection5quad3[-1]#[0]
+        blk18v7 = self.ioSection5quad4[-1]#[0]
+
+        self.block18Points = [
+            blk18v4, blk18v5, blk18v6, blk18v7,
+            blk18v0, blk18v1, blk18v2, blk18v3,
+            #blk18v4, blk18v5, blk18v6, blk18v7,
+        ]
+
+        """
+        self.init_3d_plot()
+        print('block 18')
+        colors = ['r','g','b','c','m','y','k','b']
+        for pnt, c in zip(self.block18Points, colors):
+            print(pnt)
+            self.plot_points([pnt], c)
+        """
+
+        # Computes Theta and Phi for the inlet surface
+        vInletFront   = blk18v6
+        self.show_plot()
+        vInletFrontXY = [vInletFront[0], vInletFront[1], 0]
+        print(f'vInletFront:   {vInletFront}')
+        print(f'vInletFrontXY: {vInletFrontXY}')
+
+        # WARNING: works only in the first quadrand!
+        # Since eX = [1, 0, 0] the angle can be easily found in the following way
+        theta = np.arccos(vInletFront[2]   / self.c2)
+        thetaOutlet = np.arccos(vInletFront[0]/(self.a1*np.sin(theta)))
+        # Since eZ = [0, 0, 1] the angle can be easily found in the following way
+        phiInlet   = np.arccos(vInletFront[2]   / self.c2)
+
+        print(f'theta    [deg]: {np.rad2deg(theta)})')
+        print(f'phiInlet [deg]: {np.rad2deg(phiInlet)}')
+
+        # Theta: apearture from the x_axis on the XY plane
+        N = 10
+        theta  = thetaOutlet
+        thetaMin = +theta
+        thetaMax = -theta
+        angles = np.linspace(thetaMin, thetaMax, N)
+        print(f'thetaOutlet [deg]: {thetaOutlet}')
+        print(f'angles [deg]: {angles}')
+
+        # Spline edges for the inlet surface
+        c03 = [] # Spline points for edge 03
+        c10 = [] # Spline points for edge 10
+        c21 = [] # Spline points for edge 21
+        c32 = [] # Spline points for edge 32
+
+        for theta in angles:
+            print(f'Theta [deg]: {theta}')
+            if theta < 0:
+                theta = 2*np.pi + theta
+            centralPoint = self.point_on_ellipsoid(theta, phiInlet)
+
+            tmp = self.rotQuatC1.apply(centralPoint)
+            c03.append(tmp)
+            tmp = self.rotQuatC2.apply(centralPoint)
+            c10.append(tmp)
+            tmp = self.rotQuatC3.apply(centralPoint)
+            c21.append(tmp)
+            tmp = self.rotQuatC4.apply(centralPoint)
+            c32.append(tmp)
+
+        self.block18Edges = [
+            #Edge(0, 1, c2), # Arc Edge
+            #Edge(1, 2, c3), # Arc Edge
+            #Edge(2, 3, c4), # Arc Edge
+            #Edge(3, 0, c1), # Arc Edge
+            Edge(0, 3, c03), # Spline Edge
+            Edge(1, 0, c10), # Spline Edge
+            Edge(2, 1, c21), # Spline Edge
+            Edge(3, 2, c32), # Spline Edge
+        ]
+
+
+        #sys.exit()
+        self.block18 = Block.create_from_points(self.block18Points, self.block18Edges)
+        self.block18.set_patch('bottom','outlet')
+        self.block18.set_patch('top','wall')
+
+        self.block18.chop(0, count=10, c2c_expansion=1)
+        self.block18.chop(1, count=10, c2c_expansion=1)
+        self.block18.chop(2, count=10, c2c_expansion=1)
+
+
     # TODO: Put this part into the main for code clarity
     def mesh_3D(self):
         """
-
+        Calls all the functions
         """
         mesh = Mesh()
 
@@ -1307,8 +1618,12 @@ class Hayabusa:
         self.build_block12()
         self.build_block13()
         # Section 4
-
+        self.build_block14()
+        self.build_block15()
+        self.build_block16()
+        self.build_block17()
         # Section 5
+        self.build_block18()
 
 
         # Assembles the blocks
@@ -1330,8 +1645,12 @@ class Hayabusa:
         mesh.add_block(self.block12)
         mesh.add_block(self.block13)
         # Section 4
-
+        mesh.add_block(self.block14)
+        mesh.add_block(self.block15)
+        mesh.add_block(self.block16)
+        mesh.add_block(self.block17)
         # Section 5
+        mesh.add_block(self.block18)
 
 
         mesh.write(output_path=os.path.join('case','system','blockMeshDict'))
