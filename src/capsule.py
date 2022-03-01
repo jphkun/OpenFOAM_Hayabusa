@@ -23,10 +23,30 @@ from classy_blocks.classes.block import Block                       # type: igno
 from classy_blocks.classes.primitives import Edge                   # type: ignore[code, ...]
 from classy_blocks.util import functions as f                       # type: ignore[code, ...]
 
-class Hayabusa:
+# OKTODO: Implement the cell inflation on the 3D mesh
+# TODO: Implement the 2D mesh
+# TODO: Implement a simple case with rhoSonicFoam
+# TODO: Add mesh rotation for the 2D case
+# TODO: Add mesh rotation for the 3D case
+# TODO: README.md
+# TODO: Drawing for the docuementation
+# TODO: Correct the arc center problem
+# TODO: Equilibrate the number of cell for each block
+# TODO: BUG, solve the problem with -t =/= -p
+
+# For the sake of doing it:
+# TODO: Finish tests for point_on_ellipsoid
+# TODO: point_on_straigt_front:
+#       - add test
+#       - add special case when x < 0.11
+# TODO: point_on_straigt_back:
+#       - add test
+#       - add special case when x > 0.8
+
+class MeshInfo:
 
     def __init__(self,
-                 dimentions: str,
+                 dimensions: str,
                  capsuleDia: float,
                  rNpoints: int,
                  thetaNpoints: int,
@@ -50,14 +70,14 @@ class Hayabusa:
         inflation: float
             Inflation layer parameter
         """
-        self.dimensions = dimentions
+        self.dimensions = dimensions
         self.capsuleDia = 0.4
         self.capsuleRad = self.capsuleDia/2
         self.capsuleSphereCenter = [self.capsuleDia/5, 0, 0]
         self.rNpoints = rNpoints
         self.thetaNpoints = thetaNpoints
         self.phiNpoints = phiNpoints
-        self.inflatio = inflation
+        self.cellInflationRatio = inflation
         # a1, b1, c1, are the "front" ellipsoid semi-axis
         self.a1 = 10 * self.capsuleDia
         self.b1 = 10 * self.capsuleDia
@@ -68,7 +88,6 @@ class Hayabusa:
         self.b2 = 10 * self.capsuleDia
         self.c2 = 10 * self.capsuleDia
 
-    # TODO: Wrong type hinting output
     def point_on_sphere(self,
                         rho: float,
                         theta: float,
@@ -108,7 +127,6 @@ class Hayabusa:
         point = [x, y, z]
         return point
 
-    # TODO: Wrong type hinting output
     def point_on_ellipsoid(self, theta: float, phi: float) -> list[float]:
         """
         Returns a surface point of the ellipsoid that constitutes the O mesh.
@@ -125,7 +143,6 @@ class Hayabusa:
         point: Vector
             X, Y, Z position on the surface of the ellipsoid
         """
-        # TODO: add a test
         # Tests if phi is between 0 and 2pi
         if theta < 0 or theta > 2*np.pi:
             print("Theta is not between 0 and 2pi")
@@ -160,70 +177,7 @@ class Hayabusa:
         point: list[float] = [x, y, z]
         return point  # cadran
 
-    def circle_on_sphere(self,
-                         rho: float,
-                         alpha: float,
-                         beta: float,
-                         gamma: float,
-                         t: float
-                         ) -> list[float]:
-        """
-        https://math.stackexchange.com/questions/643130/circle-on-sphere
-        https://mathworld.wolfram.com/SphericalCoordinates.html
-
-        Parameters
-        ----------
-        rho: float
-            radius of the sphere
-        alpha:
-            radius angle (cone aperture)
-        beta: float
-            angle between the north pole and the central point of the circle
-        gamma: float
-            angle from the x-axis on the XY plane
-        t: float
-            angle on the cricle
-
-        Returns
-        -------
-        point: vector
-            (x,y,z) coordinates
-        """
-        x = rho * ( (np.sin(alpha) * np.cos(beta) * np.cos(gamma) * np.cos(t)) \
-                  - (np.sin(alpha) * np.sin(gamma)* np.sin(t)    ) \
-                  + (np.cos(alpha) * np.sin(beta) * np.cos(gamma)) )
-
-        y = rho * ( (np.sin(alpha) * np.cos(beta) * np.sin(gamma) * np.cos(t)) \
-                  + (np.sin(alpha) * np.cos(gamma)* np.sin(t)) \
-                  + (np.cos(alpha) * np.sin(beta) * np.sin(gamma)))
-
-        z = rho * (-(np.sin(alpha)*np.sin(beta)*np.cos(t)) + (np.cos(alpha)*np.cos(beta)))
-
-        point = [x, y, z]
-        return point
-
-    # TODO: Documentation
-    # TODO: Type defintion
-    def point_circle_xaxis(self, og, r, theta):
-        """
-        Computes a point on a circle whoes central point is on the x axis
-
-        Parameters
-        ----------
-        og: float
-            origin point of the cirlce
-
-        """
-        x = og[0]
-        y = og[1] + r * np.sin(theta)
-        z = og[2] + r * np.cos(theta)
-        point = [x, y, z]
-        return point
-
-    # TODO: Generaliste the a, b, c variables
-    # TODO: set them as inputs?
-    @staticmethod
-    def angle_conversion(alpha):
+    def angle_conversion(self, alpha:float) -> float:
         """
         converts the angle form one reference frame to the other
 
@@ -237,145 +191,31 @@ class Hayabusa:
         theta: float
             angle in the second/final reference frame
         """
-        # TODO: Generalize
-        b = 200
-        c = 80
+        b = self.capsuleDia / 2
+        c = self.capsuleSphereCenter[0]
         a = np.sqrt(b**2 + c**2 - 2*b*c*np.cos(alpha))
         theta = np.arcsin(b * np.sin(alpha) / a)
         return theta
 
-    # TODO: make the return block documentation correct
-    # TODO: Documentation, look at how to do a class
-    # TODO: max 100 lines for this function
-    def block1_3d(self):
-        """
-        Constructs block 1 and return a block with edges.
-        """
-        # Center point of the sphere
-        sphereOg = [0.08, 0, 0]
-
-        #######################################################################
-        # WARNING all the following points are in the negative x direction
-        # hence add 180 deg for the correct point description in spherical
-        # coordinates.
-        #######################################################################
-        # Angle between the XY plane the sphere origin and vertex 1 of the block
-        block1Alpha = np.arcsin(1/4)
-        print(f'block1Alpha [deg]: {np.rad2deg(block1Alpha)}')
-        # Angle between the XZ plane the sphere origin and vertex 1 of the block
-        block1Beta  = np.arcsin(1/4)
-        print(f'block1Beta [deg]: {np.rad2deg(block1Beta)}')
-        # Angle between the XY plane the MESH origin and vertex 4 of the block
-        block1Theta = self.angle_conversion(block1Alpha)
-        print(f'block1Theta [deg]: {np.rad2deg(block1Theta)}')
-        # Angle between the XZ plane the MESH origin and vertex 4 of the block
-        block1Phi   = self.angle_conversion(block1Beta)
-        print(f'block1Phi [deg]: {np.rad2deg(block1Phi)}')
-
-        # Vertex 0
-        alpha0 = np.pi   + block1Alpha
-        beta0  = np.pi/2 - block1Beta
-        blk1v0 = self.point_on_sphere(self.capsuleRad, alpha0, beta0, sphereOg)
-        print(f'alpha0 [deg]: {np.rad2deg(alpha0)}')
-        print(f'beta0 [deg]: {np.rad2deg(beta0)}')
-        # Vertex 1
-        alpha1 = np.pi   - block1Alpha
-        beta1  = np.pi/2 - block1Beta
-        blk1v1 = self.point_on_sphere(self.capsuleRad, alpha1, beta1, sphereOg)
-        # Vertex 2
-        alpha2 = np.pi   - block1Alpha
-        beta2  = np.pi/2 + block1Beta
-        blk1v2 = self.point_on_sphere(self.capsuleRad, alpha2, beta2, sphereOg)
-        # Vertex 3
-        alpha3 = np.pi   + block1Alpha
-        beta3  = np.pi/2 + block1Beta
-        blk1v3 = self.point_on_sphere(self.capsuleRad, alpha3, beta3, sphereOg)
-        # Vertex 4
-        theta4 = np.pi   + block1Theta
-        phi4   = np.pi/2 - block1Phi
-        blk1v4 = self.point_on_ellipsoid(theta4, phi4)
-        # Vertex 5
-        theta5 = np.pi   - block1Theta
-        phi5   = np.pi/2 - block1Phi
-        blk1v5 = self.point_on_ellipsoid(theta5, phi5)
-        # Vertex 6
-        theta6 = np.pi   - block1Theta
-        phi6   = np.pi/2 + block1Phi
-        blk1v6 = self.point_on_ellipsoid(theta6, phi6)
-        # Vertex 7
-        theta7 = np.pi   + block1Theta
-        phi7   = np.pi/2 + block1Phi
-        blk1v7 = self.point_on_ellipsoid(theta7, phi7)
-
-        # Block point definition
-        self.block1Vertices = [
-            blk1v0, blk1v1, blk1v2, blk1v3,  # Face 1
-            blk1v4, blk1v5, blk1v6, blk1v7,  # Face 2?
-        ]
-
-        # Arc defintions
-        #######################################################################
-        # WARNING: alpha is set to pi since the front of the capsule is set in
-        # the negative x direction
-        #######################################################################
-        edge01pnt = self.point_on_sphere(self.capsuleRad, np.pi,  beta1,   sphereOg)
-        edge12pnt = self.point_on_sphere(self.capsuleRad, alpha1, np.pi/2, sphereOg)
-        edge23pnt = self.point_on_sphere(self.capsuleRad, np.pi,  beta3,   sphereOg)
-        edge30pnt = self.point_on_sphere(self.capsuleRad, alpha3, np.pi/2, sphereOg)
-
-        # Spline defintions
-        # Number of points for each spline defintion
-        N = 10
-        # Computation of the angles at which to compute the interpolation point
-        # for the spline.
-        angles45 = np.linspace(theta4, theta5, N),
-        edge45pnts = [self.point_on_ellipsoid(i, phi4) for i in angles45[0]]
-
-        angles56 = np.linspace(phi5, phi6, N),
-        edge56pnts = [self.point_on_ellipsoid(theta5, i) for i in angles56[0]]
-
-        angles67 = np.linspace(theta6, theta7, N),
-        edge67pnts = [self.point_on_ellipsoid(i, phi6) for i in angles67[0]]
-
-        angles74 = np.linspace(phi7, phi4, N),
-        edge74pnts = [self.point_on_ellipsoid(theta7, i) for i in angles74[0]]
-
-        self.block1Edges = [
-            Edge(0, 1, edge01pnt),  # Arc edge
-            Edge(1, 2, edge12pnt),  # Arc edge
-            Edge(2, 3, edge23pnt),  # Arc edge
-            Edge(3, 0, edge30pnt),  # Arc edge
-            Edge(4, 5, edge45pnts),  # Spline edge
-            Edge(5, 6, edge56pnts),  # Spline edge
-            Edge(6, 7, edge67pnts),  # Spline edge
-            Edge(7, 4, edge74pnts),  # Spline edge
-        ]
-
-        self.block1 = Block.create_from_points(
-            self.block1Vertices,
-            self.block1Edges
-        )
-        self.block1.set_patch('top', 'inlet')
-        self.block1.set_patch('bottom', 'wall')
-
-        self.block1.chop(0, count=10, c2c_expansion=1)
-        self.block1.chop(1, count=10, c2c_expansion=1)
-        self.block1.chop(2, count=10, c2c_expansion=1)
-
     def init_3d_plot(self):
         """
+        WARNING: Do no delete useful for debugging without using paraview!
+
         Initialises a plot instance. This permits to plot multtiple points
-        accross multiple functions
+        accross multiple functions.
         """
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(projection='3d')
 
-    def plot_points(self, pnts, c):
+    def plot_points(self, pnts:list, c:str):
         """
-        Plots the points with a color
+        WARNING: Do no delete useful for debugging without using paraview!
 
-        Parameters:
-        pnts: array
+        Plots the points with a color. Points are in list format
+
+        Parameters
+        ----------
+        pnts: list
             Point in 3D space so something like [[x1, y1, z1], ...]
         c: str
             Color of the point. Some examples: 'r', 'g', 'b', 'k', 'c', 'm'
@@ -398,13 +238,23 @@ class Hayabusa:
 
     def show_plot(self):
         """
+        WARNING: Do no delete useful for debugging without using paraview!
+
         Shows the plot when python code is launched through terminal
         """
         plt.show()
 
-    # TODO: Documentation
-    def point_on_straight_front(self, x):
+    def point_on_straight_front(self, x:float):
         """
+        Function that permits to compute the points at the front of the capsule
+        between the arc edge and the middle YZ plane centered at the origin.
+        The input is the x position of the desired point. Will be generally used
+        with a linspace array.
+
+        Parameter
+        ---------
+        x: float
+            X position of the computed point.
         """
         # TODO: Add test for x < -0.11 and x > 0
         if x > 0:
@@ -415,9 +265,16 @@ class Hayabusa:
         point = [x, y, z]
         return point
 
-    # TODO: Documentation
-    def point_on_straight_back(self, x):
+    def point_on_straight_back(self, x:float):
         """
+        Function that permits to compute the points at the back of the capsule.
+        The function is valit from theYZ plane centered at the origin, up until
+        the YZ plane 1/5 of the capsule diamter on the back
+
+        Parameter
+        ---------
+        x: float
+            X position of the computed point.
         """
         # TODO: Generalise the 0.08
         if x > 0.08:
@@ -431,8 +288,7 @@ class Hayabusa:
         point = [x, y, z]
         return point
 
-    # TODO: Documentation + type defining
-    def point_on_vertical_back(self, z: float):
+    def point_on_vertical_back(self, z:float) -> list[float]:
         """
         This function converts the vertical point z which is inserted as an
         input, to a 3D point.
@@ -444,7 +300,7 @@ class Hayabusa:
 
         Return
         ------
-        point: array
+        point: list[float]
             3D point of the back of the capusle
         """
         x = self.capsuleSphereCenter[0]
@@ -454,7 +310,7 @@ class Hayabusa:
         return point
 
     # TODO: Documentation
-    # TODO: Logic semplification
+    # TODO: Logic simplification
     def section_points(self):
         """
 
@@ -535,8 +391,8 @@ class Hayabusa:
         print(f'anglesOutlet3 [deg]:\n {np.rad2deg(anglesOutlet3)}')
         print(f'anglesOutlet4 [deg]:\n {np.rad2deg(anglesOutlet4)}')
         print(f'anglesOutlet5 [deg]:\n {np.rad2deg(anglesOutlet5)}')
-        # Central points on wall/capsule
 
+        # Central points on wall/capsule
         # Front of the capsule
         # Section 0
         self.ccPnts0 = [self.point_on_sphere( self.capsuleRad, np.pi, ang, sphereOg) for ang in anglesCapsule0]
@@ -630,7 +486,7 @@ class Hayabusa:
         self.plot_points(icPnts2,'b')
         """
 
-    def rotation_vector(self, e, rot):
+    def rotation_vector(self, e:float, rot:float) -> list[float]:
         """
         Returns a rotation vector for quaternions.
 
@@ -918,9 +774,22 @@ class Hayabusa:
         self.block1.set_patch('top', 'inlet')
         self.block1.set_patch('bottom', 'wall')
 
-        self.block1.chop(0, count=10, c2c_expansion=1)
-        self.block1.chop(1, count=10, c2c_expansion=1)
-        self.block1.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block1.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block1.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block1.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block2(self):
         """
@@ -957,9 +826,22 @@ class Hayabusa:
         self.block2.set_patch('top', 'inlet')
         self.block2.set_patch('bottom', 'wall')
 
-        self.block2.chop(0, count=10, c2c_expansion=1)
-        self.block2.chop(1, count=10, c2c_expansion=1)
-        self.block2.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block2.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block2.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block2.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block3(self):
         """
@@ -995,9 +877,22 @@ class Hayabusa:
         self.block3.set_patch('top', 'inlet')
         self.block3.set_patch('bottom', 'wall')
 
-        self.block3.chop(0, count=10, c2c_expansion=1)
-        self.block3.chop(1, count=10, c2c_expansion=1)
-        self.block3.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block3.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block3.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block3.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block4(self):
         """
@@ -1033,9 +928,22 @@ class Hayabusa:
         self.block4.set_patch('top', 'inlet')
         self.block4.set_patch('bottom', 'wall')
 
-        self.block4.chop(0, count=10, c2c_expansion=1)
-        self.block4.chop(1, count=10, c2c_expansion=1)
-        self.block4.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block4.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block4.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block4.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block5(self):
         """
@@ -1069,9 +977,22 @@ class Hayabusa:
         self.block5.set_patch('top', 'inlet')
         self.block5.set_patch('bottom', 'wall')
 
-        self.block5.chop(0, count=10, c2c_expansion=1)
-        self.block5.chop(1, count=10, c2c_expansion=1)
-        self.block5.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block5.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block5.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block5.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block6(self):
         """
@@ -1107,9 +1028,22 @@ class Hayabusa:
         self.block6.set_patch('top', 'inlet')
         self.block6.set_patch('bottom', 'wall')
 
-        self.block6.chop(0, count=10, c2c_expansion=1)
-        self.block6.chop(1, count=10, c2c_expansion=1)
-        self.block6.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block6.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block6.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block6.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block7(self):
         """
@@ -1144,9 +1078,22 @@ class Hayabusa:
         self.block7.set_patch('top', 'inlet')
         self.block7.set_patch('bottom', 'wall')
 
-        self.block7.chop(0, count=10, c2c_expansion=1)
-        self.block7.chop(1, count=10, c2c_expansion=1)
-        self.block7.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block7.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block7.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block7.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block8(self):
         """
@@ -1181,9 +1128,22 @@ class Hayabusa:
         self.block8.set_patch('top', 'inlet')
         self.block8.set_patch('bottom', 'wall')
 
-        self.block8.chop(0, count=10, c2c_expansion=1)
-        self.block8.chop(1, count=10, c2c_expansion=1)
-        self.block8.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block8.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block8.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block8.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block9(self):
         """
@@ -1217,9 +1177,22 @@ class Hayabusa:
         self.block9.set_patch('top', 'inlet')
         self.block9.set_patch('bottom', 'wall')
 
-        self.block9.chop(0, count=10, c2c_expansion=1)
-        self.block9.chop(1, count=10, c2c_expansion=1)
-        self.block9.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block9.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block9.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block9.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block10(self):
         """
@@ -1257,9 +1230,22 @@ class Hayabusa:
         self.block10.set_patch('top', 'outlet')
         self.block10.set_patch('bottom', 'wall')
 
-        self.block10.chop(0, count=10, c2c_expansion=1)
-        self.block10.chop(1, count=10, c2c_expansion=1)
-        self.block10.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block10.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block10.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block10.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block11(self):
         """
@@ -1294,9 +1280,22 @@ class Hayabusa:
         self.block11.set_patch('top', 'outlet')
         self.block11.set_patch('bottom', 'wall')
 
-        self.block11.chop(0, count=10, c2c_expansion=1)
-        self.block11.chop(1, count=10, c2c_expansion=1)
-        self.block11.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block11.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block11.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block11.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block12(self):
         """
@@ -1331,9 +1330,22 @@ class Hayabusa:
         self.block12.set_patch('top', 'outlet')
         self.block12.set_patch('bottom', 'wall')
 
-        self.block12.chop(0, count=10, c2c_expansion=1)
-        self.block12.chop(1, count=10, c2c_expansion=1)
-        self.block12.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block12.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block12.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block12.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block13(self):
         """
@@ -1366,9 +1378,22 @@ class Hayabusa:
         self.block13.set_patch('top', 'outlet')
         self.block13.set_patch('bottom', 'wall')
 
-        self.block13.chop(0, count=10, c2c_expansion=1)
-        self.block13.chop(1, count=10, c2c_expansion=1)
-        self.block13.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block13.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block13.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block13.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block14(self):
         """
@@ -1402,9 +1427,22 @@ class Hayabusa:
         self.block14.set_patch('top', 'outlet')
         self.block14.set_patch('bottom', 'wall')
 
-        self.block14.chop(0, count=10, c2c_expansion=1)
-        self.block14.chop(1, count=10, c2c_expansion=1)
-        self.block14.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block14.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block14.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block14.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block15(self):
         """
@@ -1437,9 +1475,22 @@ class Hayabusa:
         self.block15.set_patch('top', 'outlet')
         self.block15.set_patch('bottom', 'wall')
 
-        self.block15.chop(0, count=10, c2c_expansion=1)
-        self.block15.chop(1, count=10, c2c_expansion=1)
-        self.block15.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block15.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block15.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block15.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block16(self):
         """
@@ -1472,9 +1523,22 @@ class Hayabusa:
         self.block16.set_patch('top', 'outlet')
         self.block16.set_patch('bottom', 'wall')
 
-        self.block16.chop(0, count=10, c2c_expansion=1)
-        self.block16.chop(1, count=10, c2c_expansion=1)
-        self. block16.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block16.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block16.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block16.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block17(self):
         """
@@ -1505,9 +1569,22 @@ class Hayabusa:
         self.block17.set_patch('top', 'outlet')
         self.block17.set_patch('bottom', 'wall')
 
-        self.block17.chop(0, count=10, c2c_expansion=1)
-        self.block17.chop(1, count=10, c2c_expansion=1)
-        self.block17.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block17.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block17.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block17.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = self.cellInflationRatio
+        )
 
     def build_block18(self):
         """
@@ -1599,9 +1676,22 @@ class Hayabusa:
         self.block18.set_patch('bottom', 'outlet')
         self.block18.set_patch('top', 'wall')
 
-        self.block18.chop(0, count=10, c2c_expansion=1)
-        self.block18.chop(1, count=10, c2c_expansion=1)
-        self.block18.chop(2, count=10, c2c_expansion=1)
+        # Cell grading and distribution
+        self.block18.chop(
+            axis = 0,
+            count = self.phiNpoints,
+            c2c_expansion = 1
+        )
+        self.block18.chop(
+            axis = 1,
+            count= self.thetaNpoints,
+            c2c_expansion = 1
+        )
+        self.block18.chop(
+            axis = 2,
+            count=self.rNpoints,
+            c2c_expansion = 1/self.cellInflationRatio
+        )
 
     # TODO: Put this part into the main for code clarity
     def mesh_3D(self):

@@ -1,6 +1,6 @@
 import argparse
 from typing import Union, Dict, Optional, Sequence
-from src.capsule import Hayabusa
+from src.capsule import MeshInfo
 
 def cli(argv: Optional[Sequence[str]] = None ) -> dict[str,object]:
     """
@@ -9,15 +9,27 @@ def cli(argv: Optional[Sequence[str]] = None ) -> dict[str,object]:
 
     Parameter
     --------
-    None
+    argv: sequence[str]
+        User Command Line Interface (CLI) inputs are sotred into this array.
 
     Return
     ------
     meshParameters: dict
         Dictionnary wich conatinas the necessary information to compute the mesh
     """
-    parser = argparse.ArgumentParser()
-    # TODO: General helper and code description
+
+    PROGRAM_DESCRIPTION = """
+    The main function of this software is to generate a 2D or 3D blockMeshDict
+    file of the JAXA Hayabusa capsule. The final goal of this project is to be
+    able to replicate Teramoto's paper from 2001 and maybe even simulate the
+    capsule at all flight regimes encountered during an atmospheric re-entry.
+    """
+
+    # Parser initialisation
+    parser = argparse.ArgumentParser(
+        description=PROGRAM_DESCRIPTION,
+        formatter_class=argparse.RawTextHelpFormatter
+    )
 
     # Mesh dimensions
     parser.add_argument(
@@ -67,7 +79,7 @@ def cli(argv: Optional[Sequence[str]] = None ) -> dict[str,object]:
 
     # Spherical coordinates use the mathematical convention in this case
     meshParameters = {
-        'dimentions':           args.mesh_dimensions,
+        'dimensions':           args.mesh_dimensions,
         'capsuleDiameter':      args.capsule_diameter,
         'radialNumberOfPoints': args.r,
         'thetaNumberOfPoints':  args.t,
@@ -89,15 +101,26 @@ def main(inputParameters:dict) -> None:
     Return
     ------
     """
-    mesh = Hayabusa(
-        dimentions =   inputParameters['dimentions'],
+    mesh = MeshInfo(
+        dimensions =   inputParameters['dimensions'],
         capsuleDia =   inputParameters['capsuleDiameter'],
         rNpoints =     inputParameters['radialNumberOfPoints'],
         thetaNpoints = inputParameters['thetaNumberOfPoints'],
         phiNpoints =   inputParameters['phiNumberOfPoints'],
         inflation =    inputParameters['inflationLayerParam'],
     )
-    mesh.mesh_3D()
+    if mesh.dimensions == '2D':
+        print('Error not implemented')
+        sys.exit()
+        # TODO: Implement this case
+
+    elif mesh.dimensions == '3D':
+        print('Computes a 3D mesh')
+        mesh.mesh_3D()
+
+    else:
+        print('Error dimension not supported, please enter 2D or 3D')
+        sys.exit()
 
 if __name__ == "__main__":
     meshParameters = cli()
