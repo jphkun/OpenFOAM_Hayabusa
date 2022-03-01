@@ -26,15 +26,19 @@ from classy_blocks.util import functions as f                       # type: igno
 class Hayabusa:
 
     def __init__(self,
+                 dimentions: str,
                  capsuleDia: float,
                  rNpoints: int,
                  thetaNpoints: int,
-                 phiNpoints: int) -> None:
+                 phiNpoints: int,
+                 inflation: float) -> None:
         """
         Init function
 
         Parameters
         ----------
+        dimensions: str
+            Number of dimension in the mesh. could be 2D or 3D
         capsuleDia: float
             Capsules diameter, determines the capsule diameter and the mesh size
         rNpoints: int
@@ -43,14 +47,17 @@ class Hayabusa:
             Number of mesh points in the "theta" direction
         phiNpoints: int
             Number of mesh points in the "phi" direction
+        inflation: float
+            Inflation layer parameter
         """
+        self.dimensions = dimentions
         self.capsuleDia = 0.4
         self.capsuleRad = self.capsuleDia/2
         self.capsuleSphereCenter = [self.capsuleDia/5, 0, 0]
         self.rNpoints = rNpoints
         self.thetaNpoints = thetaNpoints
         self.phiNpoints = phiNpoints
-
+        self.inflatio = inflation
         # a1, b1, c1, are the "front" ellipsoid semi-axis
         self.a1 = 10 * self.capsuleDia
         self.b1 = 10 * self.capsuleDia

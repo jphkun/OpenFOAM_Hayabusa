@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 8-1c9b5879390b
 Exec   : checkMesh -constant
-Date   : Feb 28 2022
-Time   : 11:45:50
+Date   : Mar 01 2022
+Time   : 11:59:51
 Host   : "pc"
-PID    : 19752
+PID    : 46843
 I/O    : uncollated
 Case   : /home/user/Documents/PhD/PhD_Kuntzer/PhD_Kuntzer/8_CFD/Hayabusa/case
 nProcs : 1
@@ -55,15 +55,15 @@ Checking topology...
 
 Checking patch topology for multiply connected surfaces...
     Patch               Faces    Points   Surface topology                  
-    inlet               900      921      ok (non-closed singly connected)  
     wall                1800     1802     ok (closed singly connected)      
+    inlet               900      921      ok (non-closed singly connected)  
     outlet              900      921      ok (non-closed singly connected)  
 
 Checking geometry...
     Overall domain bounding box (-1.60299 -4 -4) (4.0192 4 4)
     Mesh has 3 geometric (non-empty/wedge) directions (1 1 1)
     Mesh has 3 solution (non-empty) directions (1 1 1)
-    Boundary openness (-9.28406e-16 1.04267e-17 1.87168e-17) OK.
+    Boundary openness (1.21788e-16 1.04267e-17 1.87168e-17) OK.
     Max cell openness = 1.24376e-15 OK.
     Max aspect ratio = 9.48684 OK.
     Minimum face area = 4.26667e-05. Maximum face area = 0.226486.  Face area magnitudes OK.
