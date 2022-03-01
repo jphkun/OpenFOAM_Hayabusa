@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 8-1c9b5879390b
 Exec   : blockMesh
-Date   : Feb 22 2022
-Time   : 14:57:52
+Date   : Feb 28 2022
+Time   : 11:45:50
 Host   : "pc"
-PID    : 30038
+PID    : 19751
 I/O    : uncollated
 Case   : /home/user/Documents/PhD/PhD_Kuntzer/PhD_Kuntzer/8_CFD/Hayabusa/case
 nProcs : 1
@@ -132,8 +132,8 @@ Mesh Information
 Patches
 ----------------
   patch 0 (start: 52200 size: 900) name: inlet
-  patch 1 (start: 53100 size: 900) name: outlet
-  patch 2 (start: 54000 size: 1800) name: wall
+  patch 1 (start: 53100 size: 1800) name: wall
+  patch 2 (start: 54900 size: 900) name: outlet
 
 End
 
