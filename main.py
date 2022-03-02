@@ -1,6 +1,9 @@
 import argparse
 from typing import Union, Dict, Optional, Sequence
-from src.capsule import MeshInfo
+from src.capsuleMesh import CapsuleMesh
+from src.capsuleMesh2D import CapsuleMesh2D
+from src.capsuleMesh3D import CapsuleMesh3D
+
 
 def cli(argv: Optional[Sequence[str]] = None ) -> dict[str,object]:
     """
@@ -101,22 +104,30 @@ def main(inputParameters:dict) -> None:
     Return
     ------
     """
-    mesh = MeshInfo(
-        dimensions =   inputParameters['dimensions'],
-        capsuleDia =   inputParameters['capsuleDiameter'],
-        rNpoints =     inputParameters['radialNumberOfPoints'],
-        thetaNpoints = inputParameters['thetaNumberOfPoints'],
-        phiNpoints =   inputParameters['phiNumberOfPoints'],
-        inflation =    inputParameters['inflationLayerParam'],
-    )
-    if mesh.dimensions == '2D':
+    if inputParameters['dimensions'] == '2D':
         print('Error not implemented')
         sys.exit()
         # TODO: Implement this case
 
-    elif mesh.dimensions == '3D':
+    elif inputParameters['dimensions'] == '3D':
         print('Computes a 3D mesh')
-        mesh.mesh_3D()
+        mesh3D = CapsuleMesh3D(
+            dimensions =   inputParameters['dimensions'],
+            capsuleDia =   inputParameters['capsuleDiameter'],
+            rNpoints =     inputParameters['radialNumberOfPoints'],
+            thetaNpoints = inputParameters['thetaNumberOfPoints'],
+            phiNpoints =   inputParameters['phiNumberOfPoints'],
+            inflation =    inputParameters['inflationLayerParam'],
+        )
+
+        # Calls the build_* functions
+        mesh3D.compute_points()
+
+        # Calls the classy_blocks library
+        mesh3D.call_classy_blocks()
+
+        # Saves the computed point to the blockMeshDict file
+        mesh3D.write_blockMeshDict()
 
     else:
         print('Error dimension not supported, please enter 2D or 3D')

@@ -7,10 +7,10 @@
 \*---------------------------------------------------------------------------*/
 Build  : 8-1c9b5879390b
 Exec   : setsToZones -noFlipMap -constant
-Date   : Mar 01 2022
-Time   : 18:59:46
+Date   : Mar 02 2022
+Time   : 10:34:05
 Host   : "pc"
-PID    : 60287
+PID    : 20735
 I/O    : uncollated
 Case   : /home/user/Documents/PhD/PhD_Kuntzer/PhD_Kuntzer/8_CFD/Hayabusa/case
 nProcs : 1
@@ -23,13 +23,10 @@ Create time
 
 Create polyMesh for time = constant
 
+Searched : "constant/polyMesh/sets"
+Found    : 1(skewFaces)
 
-
---> FOAM FATAL ERROR: 
-Cannot find directory "polyMesh/sets" in times "constant" down to constant
-
-    From function virtual Foam::IOobject Foam::fileOperation::findInstance(const Foam::IOobject&, Foam::scalar, const Foam::word&) const
-    in file global/fileOperations/fileOperation/fileOperation.C at line 818.
-
-FOAM exiting
+Adding set skewFaces as a faceZone.
+Writing mesh.
+End
 
